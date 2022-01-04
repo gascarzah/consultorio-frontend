@@ -1,0 +1,25 @@
+.alinado {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.section-dias{
+  display: flex;
+  flex-flow: row wrap;
+ justify-content: space-evenly;
+
+  gap: 30px;
+
+
+
+}
+.button-class{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+.section-turnos{
+
+
+}

@@ -1,0 +1,52 @@
+
+<form [formGroup]="form" #espForm="ngForm">
+  <main class="container alinado">
+    <h2>Programacion</h2>
+    <mat-form-field>
+      <input type="text" placeholder="Medico" matInput [matAutocomplete]="autoMedico" [formControl]="myControlMedico"
+        formControlName="medico">
+    </mat-form-field>
+    <mat-form-field>
+
+      <input type="text" placeholder="Tiempo maximo de cita" matInput formControlName="tiempoCita" >
+    </mat-form-field>
+    <mat-autocomplete #autoMedico="matAutocomplete" [displayWith]="mostrarMedico">
+      <mat-option *ngFor="let p of medicosFiltrados$ | async" [value]="p">
+        {{p.apellidoPaterno}} {{p.apellidoMaterno}} {{p.nombres}}
+      </mat-option>
+    </mat-autocomplete>
+
+    <mat-card>
+      <mat-card-content>
+        <h2 class="example-h2">Dias</h2>
+
+        <section>
+          <div formArrayName="dias"  class="section-dias">
+            <div *ngFor="let dia of diaFormArray.controls; let i = index" [formGroupName]="i" >
+
+              <h1><mat-checkbox class="example-margin" formControlName="checked">
+                {{ dia.value.nombre }}
+              </mat-checkbox></h1>
+
+              <div formArrayName="turnos">
+
+                <div *ngFor="let turno of getDiaTurnoArray(i).controls;let j = index" [formGroupName]="j" class="section-turnos">
+                  <mat-checkbox class="example-margin" id="turno{{ i }}-{{ j }}" formControlName="checked">
+                    {{ turno.value.nombre }}
+                  </mat-checkbox>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <!-- <pre>{{ form.value | json }}</pre> -->
+        </section>
+      </mat-card-content>
+    </mat-card>
+    <div class="button-class">
+    <button mat-fab color="accent" >
+      <mat-icon>create</mat-icon>
+    </button>
+    </div>
+  </main>
+</form>

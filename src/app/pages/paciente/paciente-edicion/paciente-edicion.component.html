@@ -1,0 +1,39 @@
+<h1 mat-dialog-title>Registro Paciehnte</h1>
+
+<div mat-dialog-content class="example-container">
+  <mat-form-field>
+    <mat-label>Dni</mat-label>
+    <input matInput [(ngModel)]="data.dni" (keypress)="keyPressNumbers($event)" (ngModelChange)="data.dni=$event.trim()" [disabled] = 'habilitado' >
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Nombres</mat-label>
+    <input matInput [(ngModel)]="data.nombres" (keypress)="keyPressAlpha($event)" (ngModelChange)="data.nombres=$event.toUpperCase().trim()" required>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Apellido Paterno</mat-label>
+    <input matInput [(ngModel)]="data.apellidoPaterno" (keypress)="keyPressAlpha($event)" (ngModelChange)="data.apellidoPaterno=$event.toUpperCase().trim()" required>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Apellido Materno</mat-label>
+    <input matInput [(ngModel)]="data.apellidoMaterno" (keypress)="keyPressAlpha($event)" (ngModelChange)="data.apellidoMaterno=$event.toUpperCase().trim()" required>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Celular</mat-label>
+    <input matInput [(ngModel)]="data.celular" (keypress)="keyPressNumbers($event)" (ngModelChange)="data.celular=$event.toUpperCase().trim()" >
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Telefono</mat-label>
+    <input matInput [(ngModel)]="data.telefono" (keypress)="keyPressNumbers($event)" (ngModelChange)="data.telefono=$event.toUpperCase().trim()" >
+  </mat-form-field>
+
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="registrar()" >
+    <mat-icon>done</mat-icon>
+    <span>Aceptar</span>
+  </button>
+
+  <button mat-button [mat-dialog-close]="data.nombres" cdkFocusInitial>Cerrar</button>
+</div>

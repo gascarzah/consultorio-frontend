@@ -1,0 +1,35 @@
+<h1 mat-dialog-title>Registro Consulta</h1>
+<form [formGroup]="form" >
+<div mat-dialog-content>
+  <mat-form-field>
+    <input type="text" placeholder="Paciente" matInput [matAutocomplete]="autoPaciente"
+      [formControl]="myControlPaciente" formControlName="paciente" >
+  </mat-form-field>
+
+  <mat-autocomplete #autoPaciente="matAutocomplete" [displayWith]="mostrarPaciente"    >
+    <mat-option *ngFor="let p of pacientesFiltrados$ | async" [value]="p">
+      {{p.nombres}}
+    </mat-option>
+  </mat-autocomplete>
+
+
+
+  <!-- <mat-card class="result">
+    <mat-card-content>
+  <mat-slide-toggle matInput [(ngModel)]="data.activo">
+    <mat-label *ngIf="data.activo">  Activo</mat-label>
+    <mat-label *ngIf="!data.activo">  DesActivo</mat-label>
+  </mat-slide-toggle>
+</mat-card-content>
+</mat-card> -->
+
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="registrar()">
+    <mat-icon>done</mat-icon>
+    <span>Aceptar</span>
+  </button>
+
+  <button mat-button [mat-dialog-close]="data.paciente" cdkFocusInitial>Cerrar</button>
+</div>
+</form>
