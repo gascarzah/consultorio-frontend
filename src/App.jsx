@@ -100,7 +100,7 @@ function App() {
               element={<EditarProgramacionDetalle />}
             />
 
-            <Route path="listar-maestra" element={<ListarMaestra />} />
+            {/* <Route path="listar-maestra" element={<ListarMaestra />} />
             <Route
               path="listar-maestra/agregar-maestra"
               element={<AgregarMaestra />}
@@ -108,8 +108,8 @@ function App() {
             <Route
               path="listar-maestra/editar-maestra/:id"
               element={<EditarMaestra />}
-            />
-            {/* <Route path="listar-horario" element={<ListarHorario />} />
+            /> */}
+            <Route path="listar-horario" element={<ListarHorario />} />
             <Route
               path="listar-horario/agregar-horario"
               element={<AgregarHorario />}
@@ -117,7 +117,7 @@ function App() {
             <Route
               path="listar-horario/editar-horario/:id"
               element={<EditarHorario />}
-            /> */}
+            />
             {/* <Route
               path="listar-tipoempleado"
               element={<ListarTipoEmpleado />}

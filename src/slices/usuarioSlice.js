@@ -18,7 +18,7 @@ export const registrarUsuario = createAsyncThunk(
 
       const { data } = await clienteAxios.post("/usuarios", values);
 
-      console.log(data); cd
+      console.log(data);
       return data
     } catch (error) {
       if (error.response && error.response.data.message) {
@@ -44,7 +44,7 @@ export const getUsuario = createAsyncThunk(
     try {
 
       const { data } = await clienteAxios.get(`/usuarios/${email}`);
-      // console.log('data ==> ', data)
+      console.log('data ==> ', data)
 
       return data
     } catch (error) {

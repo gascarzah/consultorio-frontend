@@ -12,7 +12,8 @@ const initialState = {
   code: null,
   logged: false,
   email: null,
-  rol: null
+  rol: null,
+
 };
 
 
@@ -20,13 +21,14 @@ export const login = createAsyncThunk(
   'auth',
   async (values, { rejectWithValue }) => {
     try {
-
-      const { data } = await clienteAxios.post("/login", values);
+      console.log(values)
+      const { data } = await clienteAxios.post("/auth/login", values);
+      // const { data } = await clienteAxios.post("/api/v1/auth/authenticate", values);
 
 
       return data
     } catch (error) {
-
+      console.log(values)
       if (error.response && error.response.data.message) {
         return rejectWithValue(error.response.data.message)
       } else {
@@ -53,7 +55,7 @@ const authSlice = createSlice({
 
         localStorage.setItem("token", payload.access_token)
         let decoded = jwt_decode(payload.access_token)
-
+        console.log(decoded)
         state.email = decoded.sub
         state.logged = true
         state.rol = decoded.roles[0]
