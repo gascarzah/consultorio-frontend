@@ -62,7 +62,7 @@ const ListarProgramacionDetalle = () => {
 
   const pagination = (pagina) => {
     dispatch(
-      getProgramacionesPaginado({
+      getProgramacionesDetallePaginado({
         page: pagina,
         size: itemsPerPage,
       })
@@ -108,12 +108,12 @@ const ListarProgramacionDetalle = () => {
               >
                 Doctor
               </th>
-              <th
+              {/* <th
                 scope="col"
                 className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
               >
                 Especialidad
-              </th>
+              </th> */}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">

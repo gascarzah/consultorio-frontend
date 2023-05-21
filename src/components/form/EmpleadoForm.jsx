@@ -5,7 +5,6 @@ import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-import { getTipoEmpleados } from "../../slices/tipoEmpleadoSlice";
 import { registrarEmpleado } from "../../slices/empleadoSlice";
 import { Alerta } from "../Alerta";
 
@@ -209,45 +208,6 @@ const EmpleadoForm = ({ cliente }) => {
                 />
                 {errors.direccion && touched.direccion ? (
                   <Alerta>{errors.direccion}</Alerta>
-                ) : null}
-              </div>
-
-              <div className="my-3">
-                <label
-                  htmlFor="idTipoEmpleado"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  Tipo Empleado
-                </label>
-                <select
-                  name="idTipoEmpleado"
-                  value={values.idTipoEmpleado}
-                  onChange={async (e) => {
-                    const { value } = e.target;
-                    setFieldValue("idTipoEmpleado", value);
-                    // handleVerificarProgramacion(value);
-                  }}
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  style={{ display: "block" }}
-                >
-                  <option value="" label="Selecciona medico">
-                    Selecciona un Medico{" "}
-                  </option>
-
-                  {listTipoEmpleados.length > 0 &&
-                    listTipoEmpleados?.map((tipoEmpleado, index) => {
-                      return (
-                        <option
-                          key={tipoEmpleado.idTipoEmpleado}
-                          value={tipoEmpleado.idTipoEmpleado}
-                        >
-                          {tipoEmpleado.descripcion}
-                        </option>
-                      );
-                    })}
-                </select>
-                {errors.idTipoEmpleado && touched.idTipoEmpleado ? (
-                  <Alerta>{errors.idTipoEmpleado}</Alerta>
                 ) : null}
               </div>
 

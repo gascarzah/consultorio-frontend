@@ -15,7 +15,7 @@ const PreviewProgramacion = ({ programacion }) => {
           {programacion.strFechaFinal}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {programacion.estado ? "ACTIVO" : "DESACTIVO"}
+          {programacion.activo ? "ACTIVO" : "DESACTIVO"}
         </td>
       </tr>
     </>

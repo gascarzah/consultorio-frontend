@@ -19,9 +19,9 @@ const PreviewProgramacionDetalle = ({ programacionDetalle }) => {
             " " +
             programacionDetalle?.empleado?.persona.nombres}
         </td>
-        <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+        {/* <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
           {programacionDetalle?.empleado?.tipoEmpleado?.descripcion}
-        </td>
+        </td> */}
         {/* <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
           {programacionDetalle.estado === 0 ? "ACTIVO" : "DESACTIVO"}
         </td> */}

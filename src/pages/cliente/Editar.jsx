@@ -7,13 +7,13 @@ import { useDispatch } from "react-redux";
 import { getCliente } from "../../slices/clienteSlice";
 
 const EditarCliente = () => {
-  const { id } = useParams();
+  const { numeroDocumento } = useParams();
   const dispatch = useDispatch();
   const [cliente, setCliente] = useState({});
-  console.log("id EditarCliente", id);
+  console.log("id EditarCliente", numeroDocumento);
 
   useEffect(() => {
-    dispatch(getCliente(id))
+    dispatch(getCliente(numeroDocumento))
       .unwrap()
       .then((resultado) => {
         console.log("resultado ", resultado);

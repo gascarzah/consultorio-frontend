@@ -11,16 +11,17 @@ import { Alerta } from "../Alerta";
 import { useDispatch, useSelector } from "react-redux";
 
 import { getEmpleados, resetState } from "../../slices/empleadoSlice";
-import { getProgramacionEstado } from "../../slices/programacionSlice";
+
 import {
   modificarProgramacionDetalle,
   registrarProgramacionDetalle,
 } from "../../slices/programacionDetalleSlice";
+import { getProgramacionActivo } from "../../slices/programacionSlice";
 
 registerLocale("es", es);
 
 const programacionDetalleSchema = Yup.object().shape({
-  idEmpleado: Yup.string().required("Debe seleccionar un medico"),
+  numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
 });
 
 const ProgramacionDetalleForm = ({ programacionDetalle }) => {
@@ -64,7 +65,7 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
     setCheckedSabado(checked);
   };
   useEffect(() => {
-    dispatch(getProgramacionEstado(estado))
+    dispatch(getProgramacionActivo())
       .unwrap()
       .then((resultado) => {
         setProgramacion(resultado);
@@ -75,8 +76,9 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(getEmpleados({ idEmpresa: user.idEmpresa, idMaestra: 1 }));
+    dispatch(getEmpleados({ idEmpresa: user.idEmpresa }));
   }, [dispatch]);
+
   useEffect(() => {
     if (arrChecked) {
       console.log("arrChecked ", arrChecked);
@@ -100,7 +102,9 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
       checkedSabado ? 5 : "",
     ];
     if (!programacionDetalle) {
-      dispatch(registrarProgramacionDetalle(values))
+      dispatch(
+        registrarProgramacionDetalle({ ...values, idEmpresa: user.idEmpresa })
+      )
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
@@ -116,7 +120,9 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
           toast.error(errores);
         });
     } else {
-      dispatch(modificarProgramacionDetalle(values))
+      dispatch(
+        modificarProgramacionDetalle({ ...values, idEmpresa: user.idEmpresa })
+      )
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
@@ -143,7 +149,7 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
 
       <Formik
         initialValues={{
-          idEmpleado: programacionDetalle?.empleado?.idEmpleado ?? "",
+          numeroDocumento: programacionDetalle?.empleado?.numeroDocumento ?? "",
           checked: [],
           idProgramacion: programacion?.idProgramacion,
           idProgramacionDetalle: programacion?.idProgramacion,
@@ -179,17 +185,17 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
               </div>
               <div className="my-3">
                 <label
-                  htmlFor="idEmpleado"
+                  htmlFor="numeroDocumento"
                   className="uppercase text-gray-600 block font-bold"
                 >
                   Medico
                 </label>
                 <select
-                  name="idEmpleado"
-                  value={values.idEmpleado}
+                  name="numeroDocumento"
+                  value={values.numeroDocumento}
                   onChange={async (e) => {
                     const { value } = e.target;
-                    setFieldValue("idEmpleado", value);
+                    setFieldValue("numeroDocumento", value);
                     // handleVerificarProgramacion(value);
                   }}
                   className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
@@ -203,8 +209,8 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                     empleados?.map((empleado, index) => {
                       return (
                         <option
-                          key={empleado.idEmpleado}
-                          value={empleado.idEmpleado}
+                          key={empleado.numeroDocumento}
+                          value={empleado.numeroDocumento}
                         >
                           {empleado.persona.apellidoPaterno}{" "}
                           {empleado.persona.apellidoMaterno},{" "}
@@ -213,8 +219,8 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                       );
                     })}
                 </select>
-                {errors.idEmpleado && touched.idEmpleado ? (
-                  <Alerta msg={errors.idEmpleado} error={true} />
+                {errors.numeroDocumento && touched.numeroDocumento ? (
+                  <Alerta msg={errors.numeroDocumento} error={true} />
                 ) : null}
               </div>
 

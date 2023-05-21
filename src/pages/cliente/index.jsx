@@ -133,7 +133,10 @@ const ListarCliente = () => {
           <tbody className="divide-y divide-gray-200">
             {listClientes.length ? (
               listClientes.map((cliente) => (
-                <PreviewCliente key={cliente.idCliente} cliente={cliente} />
+                <PreviewCliente
+                  key={cliente.numeroDocumento}
+                  cliente={cliente}
+                />
               ))
             ) : (
               <tr>

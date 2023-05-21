@@ -22,7 +22,7 @@ const PreviewCliente = ({ cliente }) => {
           {cliente.direccion}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap flex gap-2">
-          <Link to={`editar-cliente/${cliente.idCliente}`}>
+          <Link to={`editar-cliente/${cliente.numeroDocumento}`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -39,7 +39,7 @@ const PreviewCliente = ({ cliente }) => {
             </svg>
           </Link>
 
-          <Link to={`/lista-cliente/editar-cliente/${cliente.idCliente}`}>
+          <Link to={`/lista-cliente/editar-cliente/${cliente.numeroDocumento}`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

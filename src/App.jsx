@@ -21,20 +21,15 @@ import EditarCliente from "./pages/cliente/Editar";
 import ListarEmpleado from "./pages/empleado";
 import ListarProgramacion from "./pages/programacion";
 import ListarHorario from "./pages/horario";
-import ListarTipoEmpleado from "./pages/tipoEmpleado";
-
 import ListarCita from "./pages/cita";
 import AgregarHorario from "./pages/horario/Agregar";
-import AgregarTipoEmpleado from "./pages/tipoEmpleado/Agregar";
+
 import EditarHorario from "./pages/horario/Editar";
-import EditarTipoEmpleado from "./pages/tipoEmpleado/Editar";
+
 import AgregarEmpleado from "./pages/empleado/Agregar";
 import ListarProgramacionDetalle from "./pages/programacionDetalle";
 import AgregarProgramacionDetalle from "./pages/programacionDetalle/Agregar";
 import EditarProgramacionDetalle from "./pages/programacionDetalle/Editar";
-import ListarMaestra from "./pages/maestra";
-import AgregarMaestra from "./pages/maestra/Agregar";
-import EditarMaestra from "./pages/maestra/Editar";
 
 function App() {
   function NavigateFunctionComponent(props) {
@@ -69,7 +64,7 @@ function App() {
               element={<AgregarCliente />}
             />
             <Route
-              path="listar-cliente/editar-cliente/:id"
+              path="listar-cliente/editar-cliente/:numeroDocumento"
               element={<EditarCliente />}
             />
 
@@ -100,15 +95,6 @@ function App() {
               element={<EditarProgramacionDetalle />}
             />
 
-            {/* <Route path="listar-maestra" element={<ListarMaestra />} />
-            <Route
-              path="listar-maestra/agregar-maestra"
-              element={<AgregarMaestra />}
-            />
-            <Route
-              path="listar-maestra/editar-maestra/:id"
-              element={<EditarMaestra />}
-            /> */}
             <Route path="listar-horario" element={<ListarHorario />} />
             <Route
               path="listar-horario/agregar-horario"
@@ -118,18 +104,7 @@ function App() {
               path="listar-horario/editar-horario/:id"
               element={<EditarHorario />}
             />
-            {/* <Route
-              path="listar-tipoempleado"
-              element={<ListarTipoEmpleado />}
-            />
-            <Route
-              path="listar-tipoEmpleado/agregar-tipoEmpleado"
-              element={<AgregarTipoEmpleado />}
-            />
-            <Route
-              path="listar-tipoEmpleado/editar-tipoEmpleado/:id"
-              element={<EditarTipoEmpleado />}
-            /> */}
+
             <Route path="listar-cita" element={<ListarCita />} />
             <Route path="listar-cita/agregar-cita" element={<AgregarCita />} />
 

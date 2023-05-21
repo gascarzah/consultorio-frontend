@@ -55,13 +55,13 @@ export const getProgramacionesPaginado = createAsyncThunk(
   }
 )
 
-export const getProgramacionEstado = createAsyncThunk(
-  'getProgramacionEstado',
+export const getProgramacionActivo = createAsyncThunk(
+  'getProgramacionActivo',
   async (estado, { rejectWithValue }) => {
 
     try {
 
-      const { data } = await clienteAxios.get(`/programaciones/estado/${estado}`);
+      const { data } = await clienteAxios.get(`/programaciones/activo`);
 
       return data
     } catch (error) {
@@ -111,15 +111,15 @@ const programacionSlice = createSlice({
         state.message = payload.message
         state.programaciones = []
       })
-      .addCase(getProgramacionEstado.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getProgramacionEstado payload', payload)
+      .addCase(getProgramacionActivo.fulfilled, (state, { payload }) => {
+        console.log('fulfilled getProgramacionActivo payload', payload)
         // state.loading = 'grabo'
         state.loading = false
         state.code = 201
         state.message = 'se encontro'
         state.programacion = payload
       })
-      .addCase(getProgramacionEstado.rejected, (state, { payload }) => {
+      .addCase(getProgramacionActivo.rejected, (state, { payload }) => {
         console.log('rejected payload', payload)
         state.loading = false
         state.code = payload.status

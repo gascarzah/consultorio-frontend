@@ -39,19 +39,19 @@ export const registrarEmpleado = createAsyncThunk(
 
 export const getEmpleados = createAsyncThunk(
   'getEmpleado',
-  async (valueS, { rejectWithValue }) => {
-    console.log('values ==> ', valueS)
+  async (value, { rejectWithValue }) => {
+    console.log('value ==> ', value)
 
 
     try {
 
       // const { data } = await clienteAxios.get(`/empleados/medicos/${value}`);
-      const { data } = await clienteAxios.get(`/empleados/tipoEmpleado/${value.idEmpresa}/${value.idMaestra}`);
+      const { data } = await clienteAxios.get(`/empleados/empresa/${value.idEmpresa}`);
       console.log('data ==> ', data)
 
       return data
     } catch (error) {
-      console.error('error')
+      console.error('error', error)
       console.error(error.response.data.message)
       return rejectWithValue(error.response.data)
     }

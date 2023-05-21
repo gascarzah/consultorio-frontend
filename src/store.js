@@ -9,9 +9,9 @@ import programacionDetalle from './slices/programacionDetalleSlice'
 import cita from './slices/citaSlice'
 import empresa from './slices/empresaSlice'
 import horario from './slices/horarioSlice'
-import tipoEmpleado from './slices/tipoEmpleadoSlice'
+
 import consultorio from './slices/consultorioSlice'
-import maestra from './slices/maestraSlice'
+
 
 export default configureStore({
   reducer: {
@@ -25,8 +25,8 @@ export default configureStore({
     programacionDetalle,
     empresa,
     horario,
-    tipoEmpleado,
+
     consultorio,
-    maestra
+
   }
 })
