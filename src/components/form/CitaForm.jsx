@@ -25,6 +25,7 @@ const nuevaCitaSchema = Yup.object().shape({
 });
 
 const CitaForm = ({ cita }) => {
+  const { user } = useSelector((state) => state.usuario);
   const [alerta, setAlerta] = useState({});
 
   const [dias, setDias] = useState([]);

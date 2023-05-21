@@ -92,7 +92,6 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
   }, [arrChecked]);
 
   const handleSubmit = (values, resetForm) => {
-    console.log("alsubmit ===>> ", values);
     values.checked = [
       checkedLunes ? 0 : "",
       checkedMartes ? 1 : "",
@@ -101,6 +100,8 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
       checkedViernes ? 4 : "",
       checkedSabado ? 5 : "",
     ];
+    console.log("alsubmit ===>> ", values);
+
     if (!programacionDetalle) {
       dispatch(
         registrarProgramacionDetalle({ ...values, idEmpresa: user.idEmpresa })
@@ -149,7 +150,8 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
 
       <Formik
         initialValues={{
-          numeroDocumento: programacionDetalle?.empleado?.numeroDocumento ?? "",
+          numeroDocumento:
+            programacionDetalle?.empleado?.idEmpleado.numeroDocumento ?? "",
           checked: [],
           idProgramacion: programacion?.idProgramacion,
           idProgramacionDetalle: programacion?.idProgramacion,
@@ -195,6 +197,7 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                   value={values.numeroDocumento}
                   onChange={async (e) => {
                     const { value } = e.target;
+                    console.log(value);
                     setFieldValue("numeroDocumento", value);
                     // handleVerificarProgramacion(value);
                   }}
