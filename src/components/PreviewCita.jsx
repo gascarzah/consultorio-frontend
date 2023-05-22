@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const PreviewCita = ({ cita }) => {
   const { rol } = useSelector((state) => state.auth);
-
+  console.log(cita);
   return (
     <>
       <tr>

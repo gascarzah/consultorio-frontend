@@ -10,7 +10,7 @@ import es from "date-fns/locale/es";
 import { Alerta } from "../Alerta";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getEmpleados, resetState } from "../../slices/empleadoSlice";
+import { getEmpleadosPorEmpresa, resetState } from "../../slices/empleadoSlice";
 
 import {
   modificarProgramacionDetalle,
@@ -76,7 +76,7 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(getEmpleados({ idEmpresa: user.idEmpresa }));
+    dispatch(getEmpleadosPorEmpresa({ idEmpresa: user.idEmpresa }));
   }, [dispatch]);
 
   useEffect(() => {

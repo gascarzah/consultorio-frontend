@@ -11,7 +11,7 @@ import {
   registrarCita,
   editarCita,
 } from "../../slices/citaSlice";
-import { getEmpleados } from "../../slices/empleadoSlice";
+import { getEmpleadosPorEmpresa } from "../../slices/empleadoSlice";
 import { getProgramacionDetalles } from "../../slices/programacionDetalleSlice";
 import PreviewCita from "../PreviewCita";
 import { getHorarios } from "../../slices/horarioSlice";
@@ -19,7 +19,7 @@ import { getClientes } from "../../slices/clienteSlice";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 
 const nuevaCitaSchema = Yup.object().shape({
-  idMedico: Yup.string().required("Debe seleccionar un medico"),
+  numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
   idProgramacionDetalle: Yup.string().required("Debe seleccionar un dia"),
   idHorario: Yup.string().required("Debe seleccionar un horario"),
 });
@@ -47,15 +47,16 @@ const CitaForm = ({ cita }) => {
     if (cita) {
       console.log("viene de editar");
       handleProgramacionDetallada(
-        cita?.programacionDetalle?.empleado?.idEmpleado
+        cita?.programacionDetalle?.empleado?.numeroDocumento
       );
 
-      handleOnSelect({ id: cita?.cliente?.idCliente });
+      handleOnSelect({ id: cita?.cliente?.numeroDocumento });
     }
   }, [cita]);
 
   useEffect(() => {
-    dispatch(getEmpleados(1))
+    console.log(user.idEmpresa);
+    dispatch(getEmpleadosPorEmpresa(user.idEmpresa))
       .unwrap()
       .then((resultado) => {
         setListaEmpleados(resultado);
@@ -83,7 +84,7 @@ const CitaForm = ({ cita }) => {
         console.log("resultado de resultado ", resultado);
         setClientes(resultado);
         const manyItems = resultado.map((cliente, i) => ({
-          id: cliente.idCliente,
+          id: cliente.numeroDocumento,
           name:
             cliente.apellidoPaterno +
             " " +
@@ -106,7 +107,12 @@ const CitaForm = ({ cita }) => {
     console.log("Cita handleSubmit valores ===>> ", values);
     console.log("Cita  ===>> ", cita);
     if (cita) {
-      dispatch(editarCita(values))
+      dispatch(
+        editarCita({
+          ...values,
+          numeroDocumento: values.numeroDocumentoCliente,
+        })
+      )
         .unwrap()
         .then((resultado) => {
           console.log("Cita handleSubmit resultado ===>> ", resultado);
@@ -121,7 +127,7 @@ const CitaForm = ({ cita }) => {
           toast.error(errores.message);
         });
     } else {
-      const valores = { ...values, idCliente: cliente.id };
+      const valores = { ...values, numeroDocumento: cliente.id };
       console.log("handleSubmit citaForm values ", valores);
 
       dispatch(registrarCita(valores))
@@ -141,10 +147,15 @@ const CitaForm = ({ cita }) => {
     }
   };
 
-  const handleProgramacionDetallada = (values) => {
-    console.log(values);
-    if (values) {
-      dispatch(getProgramacionDetalles({ idEmpleado: values }))
+  const handleProgramacionDetallada = (numeroDocumento) => {
+    console.log(numeroDocumento);
+    if (numeroDocumento) {
+      dispatch(
+        getProgramacionDetalles({
+          numeroDocumento: numeroDocumento,
+          idEmpresa: user.idEmpresa,
+        })
+      )
         .unwrap()
         .then((resultado) => {
           console.log(
@@ -235,11 +246,12 @@ const CitaForm = ({ cita }) => {
       <Formik
         initialValues={{
           idCita: cita?.idCita ?? "",
-          idMedico: cita?.programacionDetalle?.empleado?.idEmpleado ?? "",
+          numeroDocumento:
+            cita?.programacionDetalle?.empleado?.numeroDocumento ?? "",
           idProgramacionDetalle:
             cita?.programacionDetalle?.idProgramacionDetalle ?? "",
           idHorario: cita?.horario?.idHorario ?? "",
-          idCliente: cita?.cliente?.idCliente ?? "",
+          numeroDocumentoCliente: cita?.cliente?.numeroDocumento ?? "",
         }}
         enableReinitialize={true}
         onSubmit={(values, { resetForm }) => {
@@ -252,19 +264,20 @@ const CitaForm = ({ cita }) => {
           return (
             <Form className="my-10 bg-white shadow rounded p-10 w-2/5 flex flex-col ">
               {console.log("errors ==>> ", errors)}
+              {console.log("values ==>> ", values)}
               <div className="my-3 ">
                 <label
-                  htmlFor="idMedico"
+                  htmlFor="numeroDocumento"
                   className="uppercase text-gray-600 block font-bold"
                 >
                   Medico
                 </label>
                 <select
-                  name="idMedico"
-                  value={values.idMedico}
+                  name="numeroDocumento"
+                  value={values.numeroDocumento}
                   onChange={async (e) => {
                     const { value } = e.target;
-                    setFieldValue("idMedico", value);
+                    setFieldValue("numeroDocumento", value);
                     handleProgramacionDetallada(value);
                     // props.setFieldValue("idProgramacionDetalle", "");
                   }}
@@ -279,8 +292,8 @@ const CitaForm = ({ cita }) => {
                     listaEmpleados?.map((empleado, index) => {
                       return (
                         <option
-                          key={empleado.idEmpleado}
-                          value={empleado.idEmpleado}
+                          key={empleado.numeroDocumento}
+                          value={empleado.numeroDocumento}
                         >
                           {empleado.persona.apellidoPaterno}{" "}
                           {empleado.persona.apellidoMaterno},{" "}
@@ -289,8 +302,8 @@ const CitaForm = ({ cita }) => {
                       );
                     })}
                 </select>
-                {errors.idMedico && touched.idMedico ? (
-                  <Alerta msg={errors.idMedico} error={true} />
+                {errors.numeroDocumento && touched.numeroDocumento ? (
+                  <Alerta msg={errors.numeroDocumento} error={true} />
                 ) : null}
               </div>
 
@@ -383,9 +396,13 @@ const CitaForm = ({ cita }) => {
                 {cita ? (
                   <div className="my-3">
                     <select
-                      name="idCliente"
-                      value={values.idCliente}
-                      onChange={values.handleChange}
+                      name="numeroDocumentoCliente"
+                      value={values.numeroDocumentoCliente}
+                      // onChange={values.handleChange}
+                      onChange={async (e) => {
+                        const { value } = e.target;
+                        setFieldValue("numeroDocumentoCliente", value);
+                      }}
                       className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
                     >
                       <option value="" label="Selecciona un cliente">
@@ -393,7 +410,10 @@ const CitaForm = ({ cita }) => {
                       </option>
                       {clientes?.map((item, index) => {
                         return (
-                          <option key={item.idCliente} value={item.idCliente}>
+                          <option
+                            key={item.numeroDocumento}
+                            value={item.numeroDocumento}
+                          >
                             {item.apellidoPaterno +
                               " " +
                               item.apellidoMaterno +

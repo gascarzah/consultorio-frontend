@@ -37,8 +37,8 @@ export const registrarEmpleado = createAsyncThunk(
   }
 )
 
-export const getEmpleados = createAsyncThunk(
-  'getEmpleado',
+export const getEmpleadosPorEmpresa = createAsyncThunk(
+  'getEmpleadosPorEmpresa',
   async (value, { rejectWithValue }) => {
     console.log('value ==> ', value)
 
@@ -46,7 +46,7 @@ export const getEmpleados = createAsyncThunk(
     try {
 
       // const { data } = await clienteAxios.get(`/empleados/medicos/${value}`);
-      const { data } = await clienteAxios.get(`/empleados/empresa/${value.idEmpresa}`);
+      const { data } = await clienteAxios.get(`/empleados/empresa/${value}`);
       console.log('data ==> ', data)
 
       return data
@@ -112,7 +112,7 @@ const empleadoSlice = createSlice({
   extraReducers(builder) {
     builder
       // .addCase(revertAll, () => initialState)
-      .addCase(getEmpleados.fulfilled, (state, { payload }) => {
+      .addCase(getEmpleadosPorEmpresa.fulfilled, (state, { payload }) => {
         console.log('fulfilled getEmpleado payload', payload)
         // state.loading = 'grabo'
         state.loading = false
@@ -120,7 +120,7 @@ const empleadoSlice = createSlice({
         state.message = 'se encontro'
         state.empleados = payload
       })
-      .addCase(getEmpleados.rejected, (state, { payload }) => {
+      .addCase(getEmpleadosPorEmpresa.rejected, (state, { payload }) => {
         console.log('rejected payload', payload)
         state.loading = false
         state.code = payload.status

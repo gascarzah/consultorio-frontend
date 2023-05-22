@@ -11,7 +11,7 @@ import es from "date-fns/locale/es";
 import { Alerta } from "../Alerta";
 import { useDispatch, useSelector } from "react-redux";
 import { registrarProgramacion } from "../../slices/programacionSlice";
-import { getEmpleados, resetState } from "../../slices/empleadoSlice";
+import { getEmpleadosPorEmpresa, resetState } from "../../slices/empleadoSlice";
 
 const programacionSchema = Yup.object().shape({
   fechaInicial: Yup.date().required("Fecha Inicial requerida"),
@@ -35,7 +35,7 @@ const ProgramacionForm = () => {
   }, []);
 
   useEffect(() => {
-    dispatch(getEmpleados(1));
+    dispatch(getEmpleadosPorEmpresa(user?.idEmpresa));
   }, [dispatch]);
 
   const handleSubmit = (values, resetForm) => {

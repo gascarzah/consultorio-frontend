@@ -55,10 +55,11 @@ export const getProgramacionDetalles = createAsyncThunk(
 
     try {
 
-      const result = await clienteAxios.get('/programacionesDetalladas/medico',
+      const result = await clienteAxios.get('/programacionesDetalladas/listarDiasProgramados',
         {
           params: {
-            'idMedico': values.idEmpleado
+            'numeroDocumento': values.numeroDocumento,
+            'idEmpresa': values.idEmpresa
           }
         });
       console.log('result programacionDetalle ==> ', result)

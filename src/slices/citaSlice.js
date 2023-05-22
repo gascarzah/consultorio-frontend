@@ -136,7 +136,7 @@ export const getHistorialCitas = createAsyncThunk(
           params: {
             page: values.page,
             size: values.size,
-            idCliente: values.idCliente,
+            numeroDocumentoCliente: values.numeroDocumentoCliente,
           }
         });
       return data
