@@ -118,7 +118,7 @@ function App() {
             <Route path="listar-consulta" element={<ListarConsulta />} />
 
             <Route
-              path="agregar-consulta/:id/:idCliente"
+              path="agregar-consulta/:idCita/:numeroDocumento"
               element={<AgregarConsulta />}
             />
           </Route>

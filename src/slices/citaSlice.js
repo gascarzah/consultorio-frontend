@@ -16,18 +16,19 @@ const initialState = {
   numberPage: 0
 };
 
-export const getCitas = createAsyncThunk(
-  'getCitas',
+export const getListaCitados = createAsyncThunk(
+  'getListaCitados',
   async (values, { rejectWithValue }) => {
 
-    console.log('getCitas slice values  ==> ', values)
+    console.log('getListaCitados slice values  ==> ', values)
 
     try {
 
-      const { data } = await clienteAxios.get('/citas/medico/citados',
+      const { data } = await clienteAxios.get('/citas/listaCitados',
         {
           params: {
-            idMedico: values.idMedico,
+            numeroDocumento: values.idEmpleado.numeroDocumento,
+            idEmpresa: values.idEmpleado.idEmpresa,
             numeroDiaSemana: values.numeroDiaSemana
           }
         });
@@ -35,7 +36,7 @@ export const getCitas = createAsyncThunk(
 
       return data
     } catch (error) {
-      console.error('error')
+      console.error('error', error)
       console.error(error.response.data.message)
       return rejectWithValue(error.response.data)
     }
@@ -128,7 +129,7 @@ export const eliminarCita = createAsyncThunk(
 export const getHistorialCitas = createAsyncThunk(
   'getHistorialCitas',
   async (values, { rejectWithValue }) => {
-
+    console.log('getHistorialCitas ', getHistorialCitas)
     try {
 
       const { data } = await clienteAxios.get('/citas/historial/pageable',
@@ -136,7 +137,7 @@ export const getHistorialCitas = createAsyncThunk(
           params: {
             page: values.page,
             size: values.size,
-            numeroDocumentoCliente: values.numeroDocumentoCliente,
+            numeroDocumento: values.numeroDocumento,
           }
         });
       return data
@@ -194,7 +195,7 @@ const citaSlice = createSlice({
   extraReducers(builder) {
     builder
       // .addCase(revertAll, () => initialState)
-      .addCase(getCitas.fulfilled, (state, { payload }) => {
+      .addCase(getListaCitados.fulfilled, (state, { payload }) => {
         console.log('fulfilled getCita payload', payload)
         // state.loading = 'grabo'
         state.loading = false
@@ -202,7 +203,7 @@ const citaSlice = createSlice({
         state.message = 'se encontro'
         state.citas = payload
       })
-      .addCase(getCitas.rejected, (state, { payload }) => {
+      .addCase(getListaCitados.rejected, (state, { payload }) => {
         console.log('rejected payload', payload)
         state.loading = false
         state.code = payload.status

@@ -111,6 +111,7 @@ const CitaForm = ({ cita }) => {
         editarCita({
           ...values,
           numeroDocumento: values.numeroDocumentoCliente,
+          atendido: false,
         })
       )
         .unwrap()
@@ -127,7 +128,11 @@ const CitaForm = ({ cita }) => {
           toast.error(errores.message);
         });
     } else {
-      const valores = { ...values, numeroDocumento: cliente.id };
+      const valores = {
+        ...values,
+        numeroDocumento: cliente.id,
+        atendido: false,
+      };
       console.log("handleSubmit citaForm values ", valores);
 
       dispatch(registrarCita(valores))

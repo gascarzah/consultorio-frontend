@@ -41,7 +41,7 @@ const AgregarConsulta = () => {
   const { cita, historiales, prev, next } = useSelector((state) => state.cita);
 
   const [play, setPlay] = useState(false);
-  const { id, idCliente } = useParams();
+  const { idCita, numeroDocumento } = useParams();
 
   const [listaHistorial, setListaHistorial] = useState([]);
 
@@ -55,10 +55,10 @@ const AgregarConsulta = () => {
   const [modal, setModal] = useState(false);
 
   useEffect(() => {
-    dispatch(getCita(id));
+    dispatch(getCita(idCita));
     dispatch(
       getHistorialCitas({
-        idCliente: idCliente,
+        numeroDocumento: numeroDocumento,
         page: currentPage,
         size: itemsPerPage,
       })
@@ -96,12 +96,12 @@ const AgregarConsulta = () => {
     dispatch(
       editarCita({
         idCita: values.cita.idCita,
-        idCliente: values.cita.cliente.idCliente,
+        numeroDocumento: values.cita.cliente.numeroDocumento,
         idHorario: values.cita.horario.idHorario,
         idProgramacionDetalle:
           values.cita.programacionDetalle.idProgramacionDetalle,
         informe: transcript,
-        atendido: 1,
+        atendido: true,
       })
     )
       .unwrap()
@@ -161,7 +161,7 @@ const AgregarConsulta = () => {
   const pagination = (pagina) => {
     dispatch(
       getHistorialCitas({
-        idCliente: idCliente,
+        numeroDocumento: numeroDocumento,
         page: pagina,
         size: itemsPerPage,
       })
@@ -354,6 +354,7 @@ const AgregarConsulta = () => {
                       placeholder="Informe"
                       rows="10"
                       cols="50"
+                      readOnly
                     ></textarea>
                     <div className="flex-1">
                       <input
@@ -390,11 +391,11 @@ const AgregarConsulta = () => {
                     <tbody>
                       {listaHistorial.length ? (
                         listaHistorial.map((cita, index) => (
-                          <tr className="border-b dark:border-neutral-500">
-                            <td
-                              key={cita.idCita}
-                              className="whitespace-nowrap px-6 py-4"
-                            >
+                          <tr
+                            className="border-b dark:border-neutral-500"
+                            key={cita.idCita}
+                          >
+                            <td className="whitespace-nowrap px-6 py-4">
                               <button
                                 type="button"
                                 className="bg-sky-600 hover:bg-sky-800 text-white w-full mt-5 p-3 uppercase font-bold"

@@ -3,7 +3,9 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const PreviewConsulta = ({ cita }) => {
-  const { rol } = useSelector((state) => state.auth);
+  // const { rol } = useSelector((state) => state.auth);
+
+  console.log(cita);
 
   return (
     <>
@@ -20,14 +22,20 @@ const PreviewConsulta = ({ cita }) => {
           {!cita.atendido && (
             <Link
               className="text-green-500 hover:text-green-700"
-              to={
-                rol === "MED"
-                  ? `/dashboard/agregar-consulta/${cita.idCita}/${cita.cliente?.idCliente}`
-                  : `/dashboard/editar-cita/${cita.idCita}`
-              }
+              to={`/dashboard/agregar-consulta/${cita.idCita}/${cita.cliente?.numeroDocumento}`}
             >
-              {rol === "MED" ? "Registrar Consulta" : "Editar"}
+              Registrar Consulta
             </Link>
+            // <Link
+            //   className="text-green-500 hover:text-green-700"
+            //   to={
+            //     rol === "MED"
+            //       ? `/dashboard/agregar-consulta/${cita.idCita}/${cita.cliente?.idCliente}`
+            //       : `/dashboard/editar-cita/${cita.idCita}`
+            //   }
+            // >
+            //   {rol === "MED" ? "Registrar Consulta" : "Editar"}
+            // </Link>
           )}
         </td>
       </tr>

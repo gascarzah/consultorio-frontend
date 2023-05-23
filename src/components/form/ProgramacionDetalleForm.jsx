@@ -76,7 +76,7 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
   }, []);
 
   useEffect(() => {
-    dispatch(getEmpleadosPorEmpresa({ idEmpresa: user.idEmpresa }));
+    dispatch(getEmpleadosPorEmpresa(user.idEmpresa));
   }, [dispatch]);
 
   useEffect(() => {

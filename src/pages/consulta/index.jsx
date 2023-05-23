@@ -4,13 +4,13 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import { Alerta } from "../../components/Alerta";
 import { useDispatch, useSelector } from "react-redux";
-import { getCitas, resetState } from "../../slices/citaSlice";
+import { getListaCitados, resetState } from "../../slices/citaSlice";
 
 import PreviewCita from "../../components/PreviewCita";
 import PreviewConsulta from "../../components/PreviewConsulta";
 
 const nuevoClienteSchema = Yup.object().shape({
-  idMedico: Yup.string().required("Debe seleccionar un medico"),
+  idEmpleado: Yup.string().required("Debe seleccionar un medico"),
   idProgramacionDetalle: Yup.string().required("Debe seleccionar un dia"),
 });
 const weekday = [
@@ -52,7 +52,7 @@ const ListarConsulta = () => {
   useEffect(() => {
     dispatch(resetState());
 
-    handleCitas({ idMedico: user.idEmpleado, numeroDiaSemana: getToday() });
+    handleCitas({ idEmpleado: user.idEmpleado, numeroDiaSemana: getToday() });
   }, []);
 
   const getToday = () => {
@@ -77,7 +77,7 @@ const ListarConsulta = () => {
   const handleCitas = (valores) => {
     console.log("idProgramacionDetalle a enviar ", valores);
 
-    dispatch(getCitas(valores))
+    dispatch(getListaCitados(valores))
       .unwrap()
       .then((resultado) => {
         console.log("resultadohandleCitas  ===>> ", resultado);
@@ -102,7 +102,7 @@ const ListarConsulta = () => {
 
       <Formik
         initialValues={{
-          idMedico: user.idEmpleado,
+          idEmpleado: user.idEmpleado,
           idProgramacionDetalle: diaAtencion,
         }}
         enableReinitialize={true}
