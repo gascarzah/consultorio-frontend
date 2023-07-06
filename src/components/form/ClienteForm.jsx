@@ -32,7 +32,7 @@ const ClienteForm = ({ cliente }) => {
   const navigate = useNavigate();
 
   const handleSubmit = (values, resetForm) => {
-    if (!values.numeroDocumento) {
+    if (!cliente) {
       dispatch(registrarCliente(values))
         .unwrap()
         .then((resultado) => {

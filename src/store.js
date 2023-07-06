@@ -9,7 +9,7 @@ import programacionDetalle from './slices/programacionDetalleSlice'
 import cita from './slices/citaSlice'
 import empresa from './slices/empresaSlice'
 import horario from './slices/horarioSlice'
-
+import rolMenu from './slices/rolMenuSlice'
 import consultorio from './slices/consultorioSlice'
 
 
@@ -27,6 +27,6 @@ export default configureStore({
     horario,
 
     consultorio,
-
+    rolMenu
   }
 })

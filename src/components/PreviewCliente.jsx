@@ -10,7 +10,7 @@ const PreviewCliente = ({ cliente }) => {
           {cliente.apellidoPaterno}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {cliente.apellidoPaterno}
+          {cliente.apellidoMaterno}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
           {cliente.nombres}
