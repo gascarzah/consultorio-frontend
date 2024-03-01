@@ -69,8 +69,6 @@ export const getCita = createAsyncThunk(
   async (id, { rejectWithValue }) => {
 
 
-    // console.log('values idProgramacionDetalle  ==> ', idProgramacionDetalle)
-
     try {
 
       const { data } = await clienteAxios.get(`/citas/${id}`);

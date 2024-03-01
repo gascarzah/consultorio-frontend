@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import * as Yup from "yup";
-import { Alerta } from "../components/Alerta";
+import { Alerta } from "../components";
+
 import { login } from "../slices/authSlice";
 
 const loginSchema = Yup.object().shape({
@@ -38,7 +39,7 @@ const Login = () => {
       .then((resultado) => {
         navigate("/dashboard");
 
-        console.log("respuesta ", resultado);
+        // console.log("respuesta ", resultado);
       })
       .catch((errores) => {
         console.log("errores ===>> ", errores);
@@ -113,11 +114,18 @@ const Login = () => {
                 className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold
             uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
               />
+               <Link
+          to={"/olvide-password"}
+          className={"block text-center my-5 text-slate-500 uppercase text-sm"}
+        >
+          Olvide mi password
+        </Link>
             </Form>
+            
           );
         }}
       </Formik>
-      <nav className={"lg:flex lg:justify-between"}>
+      {/* <nav className={"lg:flex lg:justify-between"}>
         <Link
           to={"/registrar"}
           className={"block text-center my-5 text-slate-500 uppercase text-sm"}
@@ -130,7 +138,7 @@ const Login = () => {
         >
           Olvide mi password
         </Link>
-      </nav>
+      </nav> */}
     </>
   );
 };

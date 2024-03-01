@@ -6,8 +6,9 @@ import {
   registrarProgramacion,
 } from "../../slices/programacionSlice";
 
-import Pagination from "../../components/Pagination";
-import PreviewProgramacion from "../../components/PreviewProgramacion";
+
+import {PreviewProgramacion, Pagination} from "../../components";
+
 import { Link, useNavigate } from "react-router-dom";
 
 const ListarProgramacionDetalle = () => {
@@ -119,7 +120,7 @@ const ListarProgramacionDetalle = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {console.log("listProgramaciones == > ", listProgramaciones)}
+            {/* {console.log("listProgramaciones == > ", listProgramaciones)} */}
             {listProgramaciones.length ? (
               listProgramaciones.map((programacion) => (
                 <PreviewProgramacion

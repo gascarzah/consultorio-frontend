@@ -1,6 +1,6 @@
 import React from "react";
 
-const Pagination = ({
+export const Pagination = ({
   totalPosts,
   postsPerPage,
   setCurrentPage,
@@ -12,6 +12,7 @@ const Pagination = ({
   disabledNext,
   setDisabledNext,
 }) => {
+  console.log(disabledNext)
   return (
     <div className="flex justify-center">
       <nav aria-label="Page navigation example">
@@ -20,7 +21,7 @@ const Pagination = ({
             <button
               disabled={disabledPrev}
               className="relative block rounded bg-sky-600 py-1.5 px-3 text-sm  text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-              onClick={() => handlePrev()}
+              onClick={handlePrev}
             >
               <span aria-hidden="true">&laquo;</span>
             </button>
@@ -38,7 +39,7 @@ const Pagination = ({
             <button
               disabled={disabledNext}
               className="relative block rounded bg-sky-600 py-1.5 px-3 text-sm text-neutral-600 transition-all duration-300 hover:bg-neutral-100 dark:text-white dark:hover:bg-neutral-700 dark:hover:text-white"
-              onClick={() => handleNext()}
+              onClick={ handleNext}
             >
               <span aria-hidden="true">&raquo;</span>
             </button>
@@ -49,4 +50,4 @@ const Pagination = ({
   );
 };
 
-export default Pagination;
+

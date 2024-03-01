@@ -4,10 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, Outlet } from "react-router-dom";
 import Modal from "react-modal";
 import { getClientesPaginado } from "../../slices/clienteSlice";
-import PreviewCliente from "../../components/PreviewCliente";
+import {PreviewCliente, Pagination} from "../../components";
 import AgregarCliente from "./Agregar";
 
-import Pagination from "../../components/Pagination";
 
 const customStyles = {
   content: {
@@ -77,6 +76,10 @@ const ListarCliente = () => {
     setModal(false);
   }
 
+  const deleteElement = (id) => {
+    console.log('borrao')
+  }
+
   const dispatch = useDispatch();
 
   return (
@@ -136,6 +139,7 @@ const ListarCliente = () => {
                 <PreviewCliente
                   key={cliente.numeroDocumento}
                   cliente={cliente}
+                  deleteElement={deleteElement}
                 />
               ))
             ) : (

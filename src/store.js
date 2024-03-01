@@ -11,6 +11,9 @@ import empresa from './slices/empresaSlice'
 import horario from './slices/horarioSlice'
 import rolMenu from './slices/rolMenuSlice'
 import consultorio from './slices/consultorioSlice'
+import antecedenteMedico from './slices/antecedenteMedicoSlice'
+import fichaMedica from './slices/fichaMedicaSlice'
+
 
 
 export default configureStore({
@@ -25,8 +28,9 @@ export default configureStore({
     programacionDetalle,
     empresa,
     horario,
-
+    antecedenteMedico,
     consultorio,
-    rolMenu
+    rolMenu,
+    fichaMedica
   }
 })

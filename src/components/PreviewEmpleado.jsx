@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const PreviewEmpleado = ({ empleado }) => {
-  console.log("Clientes que llega", empleado);
+export  const PreviewEmpleado = ({ empleado }) => {
+  // console.log("Clientes que llega", empleado);
   return (
     <>
       <tr>
@@ -61,4 +61,3 @@ const PreviewEmpleado = ({ empleado }) => {
   );
 };
 
-export default PreviewEmpleado;

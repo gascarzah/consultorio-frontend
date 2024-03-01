@@ -30,6 +30,10 @@ import AgregarEmpleado from "./pages/empleado/Agregar";
 import ListarProgramacionDetalle from "./pages/programacionDetalle";
 import AgregarProgramacionDetalle from "./pages/programacionDetalle/Agregar";
 import EditarProgramacionDetalle from "./pages/programacionDetalle/Editar";
+import FichaMedica from "./pages/fichaMedica";
+
+
+
 
 function App() {
   function NavigateFunctionComponent(props) {
@@ -67,6 +71,13 @@ function App() {
               path="listar-cliente/editar-cliente/:numeroDocumento"
               element={<EditarCliente />}
             />
+
+            <Route
+              path="ficha-medica"
+              element={<FichaMedica />}
+            />
+
+
 
             <Route path="listar-empleado" element={<ListarEmpleado />} />
             <Route

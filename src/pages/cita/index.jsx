@@ -5,8 +5,7 @@ import Modal from "react-modal";
 import { Link, Outlet } from "react-router-dom";
 import { getCitasPaginado } from "../../slices/citaSlice";
 
-import Pagination from "../../components/Pagination";
-import PreviewCita from "../../components/PreviewCita";
+import {Pagination,PreviewCita} from "../../components";
 
 const customStyles = {
   content: {

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ClienteForm from "../../components/form/ClienteForm";
+import {ClienteForm} from "../../components";
 import { useEffect } from "react";
 
 import { useDispatch } from "react-redux";

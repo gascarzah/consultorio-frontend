@@ -1,6 +1,6 @@
 import React from "react";
 
-import ClienteForm from "../../components/form/ClienteForm";
+import {ClienteForm} from  "../../components";
 
 const AgregarCliente = () => {
   return (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
@@ -13,10 +14,10 @@ import {
 } from "../../slices/citaSlice";
 import { getEmpleadosPorEmpresa } from "../../slices/empleadoSlice";
 import { getProgramacionDetalles } from "../../slices/programacionDetalleSlice";
-import PreviewCita from "../PreviewCita";
+
 import { getHorarios } from "../../slices/horarioSlice";
 import { getClientes } from "../../slices/clienteSlice";
-import { ReactSearchAutocomplete } from "react-search-autocomplete";
+import { LISTAR_CITA, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
 
 const nuevaCitaSchema = Yup.object().shape({
   numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
@@ -24,7 +25,7 @@ const nuevaCitaSchema = Yup.object().shape({
   idHorario: Yup.string().required("Debe seleccionar un horario"),
 });
 
-const CitaForm = ({ cita }) => {
+export const CitaForm = ({ cita }) => {
   const { user } = useSelector((state) => state.usuario);
   const [alerta, setAlerta] = useState({});
 
@@ -43,9 +44,9 @@ const CitaForm = ({ cita }) => {
     dispatch(resetState());
   }, []);
   useEffect(() => {
-    console.log("viene de editar1 ", cita);
+    //console.log("viene de editar1 ", cita);
     if (cita) {
-      console.log("viene de editar");
+      //console.log("viene de editar");
       handleProgramacionDetallada(
         cita?.programacionDetalle?.empleado?.numeroDocumento
       );
@@ -55,14 +56,14 @@ const CitaForm = ({ cita }) => {
   }, [cita]);
 
   useEffect(() => {
-    console.log(user.idEmpresa);
+    //console.log(user.idEmpresa);
     dispatch(getEmpleadosPorEmpresa(user.idEmpresa))
       .unwrap()
       .then((resultado) => {
         setListaEmpleados(resultado);
       })
       .catch((errores) => {
-        console.log("Cita handleSubmit errores ===>> ", errores);
+        //console.log("Cita handleSubmit errores ===>> ", errores);
         setListaEmpleados([]);
         toast.error(errores.message);
       });
@@ -73,7 +74,7 @@ const CitaForm = ({ cita }) => {
         setListaHorarios(resultado);
       })
       .catch((errores) => {
-        console.log("Cita handleSubmit errores ===>> ", errores);
+        //console.log("Cita handleSubmit errores ===>> ", errores);
         setListaHorarios([]);
         toast.error(errores.message);
       });
@@ -81,7 +82,7 @@ const CitaForm = ({ cita }) => {
     dispatch(getClientes())
       .unwrap()
       .then((resultado) => {
-        console.log("resultado de resultado ", resultado);
+        //console.log("resultado de resultado ", resultado);
         setClientes(resultado);
         const manyItems = resultado.map((cliente, i) => ({
           id: cliente.numeroDocumento,
@@ -96,16 +97,16 @@ const CitaForm = ({ cita }) => {
         setListaClientes(manyItems);
       })
       .catch((errores) => {
-        console.log("Cita handleSubmit errores ===>> ", errores);
+       // console.log("Cita handleSubmit errores ===>> ", errores);
         setListaClientes([]);
         toast.error(errores.message);
       });
-    console.log(" useeffect ===>>>> ", items);
+    //console.log(" useeffect ===>>>> ", items);
   }, [dispatch]);
 
   const handleSubmit = (values, resetForm) => {
-    console.log("Cita handleSubmit valores ===>> ", values);
-    console.log("Cita  ===>> ", cita);
+    //console.log("Cita handleSubmit valores ===>> ", values);
+    //console.log("Cita  ===>> ", cita);
     if (cita) {
       dispatch(
         editarCita({
@@ -116,12 +117,16 @@ const CitaForm = ({ cita }) => {
       )
         .unwrap()
         .then((resultado) => {
-          console.log("Cita handleSubmit resultado ===>> ", resultado);
-          console.log("Cita handleSubmit redirecciona login");
+          //console.log("Cita handleSubmit resultado ===>> ", resultado);
+          //console.log("Cita handleSubmit redirecciona login");
+          // resetForm();
+          toast.success(MENSAJE_GUARDADO_EXITOSO);
+          dispatch(resetState());
+          setTimeout(() => {
+            navigate(LISTAR_CITA);
+          }, TIEMPO_REDIRECCION);
 
-          toast.success(resultado.message);
-          resetForm();
-          navigate("/dashboard/listar-cita");
+
         })
         .catch((errores) => {
           console.log("Cita handleSubmit errores ===>> ", errores);
@@ -133,17 +138,20 @@ const CitaForm = ({ cita }) => {
         numeroDocumento: cliente.id,
         atendido: false,
       };
-      console.log("handleSubmit citaForm values ", valores);
+      //console.log("handleSubmit citaForm values ", valores);
 
       dispatch(registrarCita(valores))
         .unwrap()
         .then((resultado) => {
-          console.log("Cita handleSubmit resultado ===>> ", resultado);
-          console.log("Cita handleSubmit redirecciona login");
-
-          toast.success(resultado.message);
-          resetForm();
-          navigate("/dashboard/listar-cita");
+          //console.log("Cita handleSubmit resultado ===>> ", resultado);
+          //console.log("Cita handleSubmit redirecciona login");
+             // resetForm();
+             toast.success(MENSAJE_MODIFICADO_EXITOSO);
+             dispatch(resetState());
+             setTimeout(() => {
+               navigate(LISTAR_CITA);
+             }, TIEMPO_REDIRECCION);
+            
         })
         .catch((errores) => {
           console.log("Cita handleSubmit errores ===>> ", errores);
@@ -153,7 +161,7 @@ const CitaForm = ({ cita }) => {
   };
 
   const handleProgramacionDetallada = (numeroDocumento) => {
-    console.log(numeroDocumento);
+    //console.log(numeroDocumento);
     if (numeroDocumento) {
       dispatch(
         getProgramacionDetalles({
@@ -163,19 +171,19 @@ const CitaForm = ({ cita }) => {
       )
         .unwrap()
         .then((resultado) => {
-          console.log(
-            "Cita handleProgramacionDetallada resultado ===>> ",
-            resultado
-          );
-          console.log("Cita handleProgramacionDetallada redirecciona login");
+          // console.log(
+          //   "Cita handleProgramacionDetallada resultado ===>> ",
+          //   resultado
+          // );
+          // console.log("Cita handleProgramacionDetallada redirecciona login");
           setDias(resultado);
           setListaCitas([]);
         })
         .catch((errores) => {
-          console.log(
-            "Cita handleProgramacionDetallada errores ===>> ",
-            errores
-          );
+          // console.log(
+          //   "Cita handleProgramacionDetallada errores ===>> ",
+          //   errores
+          // );
           setListaCitas([]);
           setDias([]);
         });
@@ -186,17 +194,17 @@ const CitaForm = ({ cita }) => {
   };
 
   const handleCitas = (idProgramacionDetalle) => {
-    console.log(
-      "handleCitas idProgramacionDetalle ====>>>>  ",
-      idProgramacionDetalle
-    );
+    // console.log(
+    //   "handleCitas idProgramacionDetalle ====>>>>  ",
+    //   idProgramacionDetalle
+    // );
 
     if (idProgramacionDetalle) {
       dispatch(getCitasIdProgramacionDetalle(idProgramacionDetalle))
         .unwrap()
         .then((resultado) => {
-          console.log("Cita handleCitas resultado ===>> ", resultado);
-          console.log("Cita handleCitas redirecciona login");
+          // console.log("Cita handleCitas resultado ===>> ", resultado);
+          // console.log("Cita handleCitas redirecciona login");
           setListaCitas(resultado);
         })
         .catch((errores) => {
@@ -453,8 +461,9 @@ const CitaForm = ({ cita }) => {
           );
         }}
       </Formik>
+      <ToastContainer/>
     </>
   );
 };
 
-export default CitaForm;
+

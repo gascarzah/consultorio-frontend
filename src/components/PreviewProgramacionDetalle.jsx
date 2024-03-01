@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
-const PreviewProgramacionDetalle = ({ programacionDetalle }) => {
-  console.log("programacionDetalle que llega", programacionDetalle);
+export const PreviewProgramacionDetalle = ({ programacionDetalle }) => {
+  // console.log("programacionDetalle que llega", programacionDetalle);
   return (
     <>
       <tr>
@@ -72,4 +72,4 @@ const PreviewProgramacionDetalle = ({ programacionDetalle }) => {
   );
 };
 
-export default PreviewProgramacionDetalle;
+

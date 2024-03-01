@@ -6,7 +6,7 @@ import { getUsuario } from "../slices/usuarioSlice";
 import { headerResetState } from "../slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-const Header = () => {
+export  const Header = () => {
   // const state = useSelector(state => state)
   // console.log('state Header ===>>> ',state)
   const { email } = useSelector((state) => state.auth);
@@ -65,4 +65,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+

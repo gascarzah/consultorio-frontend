@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getListaRolMenu } from "../slices/rolMenuSlice";
-const Sidebar = () => {
+export const Sidebar = () => {
   const { rol } = useSelector((state) => state.auth);
   const { rolMenus } = useSelector((state) => state.rolMenu);
   // const [menus, setMenus] = useState([])
@@ -25,11 +25,17 @@ const Sidebar = () => {
             to={item.menu.path}
             className="bg-sky-600 w-full p-3 text-white uppercase font-bold block mt-5 text-center rounded-lg"
           >
-            {console.log(item)}
+            {/* {console.log(item)} */}
             {item.menu.nombre}
           </Link>
         ))}
-
+<Link
+          to={"ficha-medica"}
+          className="bg-sky-600 w-full p-3 text-white uppercase font-bold block mt-5 text-center rounded-lg"
+        >
+          Ficha clinica
+        </Link>
+   
         {/* <Link
           to={"listar-horario"}
           className="bg-sky-600 w-full p-3 text-white uppercase font-bold block mt-5 text-center rounded-lg"
@@ -77,4 +83,3 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;

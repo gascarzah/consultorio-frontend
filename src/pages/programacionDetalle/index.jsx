@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import Pagination from "../../components/Pagination";
+import {Pagination,PreviewProgramacionDetalle} from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { getProgramacionesDetallePaginado } from "../../slices/programacionDetalleSlice";
-import PreviewProgramacionDetalle from "../../components/PreviewProgramacionDetalle";
 
 const ListarProgramacionDetalle = () => {
   const { programacionesDetalle, prev, next, total } = useSelector(
@@ -117,10 +116,10 @@ const ListarProgramacionDetalle = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {console.log(
+            {/* {console.log(
               "listProgramacionesDetalle == > ",
               listProgramacionesDetalle
-            )}
+            )} */}
             {listProgramacionesDetalle.length ? (
               listProgramacionesDetalle.map((programacionDetalle) => (
                 <PreviewProgramacionDetalle

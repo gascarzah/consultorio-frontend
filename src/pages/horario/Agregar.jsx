@@ -1,5 +1,5 @@
 import React from "react";
-import HorarioForm from "../../components/form/HorarioForm";
+import {HorarioForm} from "../../components";
 
 const AgregarHorario = () => {
   return (

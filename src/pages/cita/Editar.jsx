@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 
 import { useDispatch } from "react-redux";
 
-import CitaForm from "../../components/form/CitaForm";
+
 import { getCita } from "../../slices/citaSlice";
+import { CitaForm } from "../../components";
 
 const EditarCita = () => {
   const { id } = useParams();

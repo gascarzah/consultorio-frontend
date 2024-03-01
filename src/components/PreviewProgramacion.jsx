@@ -1,7 +1,7 @@
 import React from "react";
 
-const PreviewProgramacion = ({ programacion }) => {
-  console.log("programacion que llega", programacion);
+export const PreviewProgramacion = ({ programacion }) => {
+  // console.log("programacion que llega", programacion);
   return (
     <>
       <tr>
@@ -22,4 +22,4 @@ const PreviewProgramacion = ({ programacion }) => {
   );
 };
 
-export default PreviewProgramacion;
+

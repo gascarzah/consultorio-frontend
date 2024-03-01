@@ -8,8 +8,7 @@ import {
   getHorariosPaginado,
 } from "../../slices/horarioSlice";
 
-import Pagination from "../../components/Pagination";
-import PreviewHorario from "../../components/PreviewHorario";
+import {Pagination, PreviewHorario} from "../../components";
 import { toast } from "react-toastify";
 
 const customStyles = {
@@ -23,35 +22,29 @@ const customStyles = {
 };
 Modal.setAppElement("#root");
 const ListarHorario = () => {
-  // const { horarios, prev, next, total } = useSelector((state) => state.horario);
+  const { horarios, prev, next, total } = useSelector((state) => state.horario);
   const [listHorarios, setListHorarios] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [disabledPrev, setDisabledPrev] = useState(false);
   const [disabledNext, setDisabledNext] = useState(false);
-  const [total, setTotal] = useState(0);
+  // const [total, setTotal] = useState(0);
   // const [modal, setModal] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
-    buscarHoriosPaginados(currentPage, itemsPerPage);
+    // buscarHoriosPaginados(currentPage, itemsPerPage);
+    dispatch(getHorariosPaginado({ page: currentPage, size: itemsPerPage }))
   }, []);
 
-  const buscarHoriosPaginados = (currentPage, itemsPerPage) => {
-    dispatch(getHorariosPaginado({ page: currentPage, size: itemsPerPage }))
-      .unwrap()
-      .then((resultado) => {
-        console.log("resultado que llega", resultado);
-        setListHorarios(resultado.content);
-        setDisabledPrev(resultado.prev);
-        setDisabledNext(resultado.next);
-        setTotal(resultado.totalElements);
-      })
-      .catch((errores) => {
-        console.log("Cita handleSubmit errores ===>> ", errores);
-        toast.error(errores.message);
-      });
-  };
+  useEffect(() => {
+    if (horarios) {
+      setListHorarios(horarios);
+      setDisabledPrev(prev);
+      setDisabledNext(next);
+    }
+  }, [horarios, currentPage]);
+
 
   const handlePrev = () => {
     console.log("handlePrev ", handlePrev);
@@ -73,23 +66,28 @@ const ListarHorario = () => {
   };
 
   const pagination = (pagina) => {
-    buscarHoriosPaginados(pagina, itemsPerPage);
+    dispatch(
+      getHorariosPaginado({
+        page: pagina,
+        size: itemsPerPage,
+      })
+    );
   };
 
   const dispatch = useDispatch();
 
   const handleDelete = (id) => {
-    console.log("horarios id que llega", id);
+    // console.log("horarios id que llega", id);
 
     dispatch(eliminarHorario(id))
       .unwrap()
       .then((resultado) => {
         // buscarHoriosPaginados(pagina, itemsPerPage);
-        console.log("resultado que llega eliminarHorario ", resultado);
+        // console.log("resultado que llega eliminarHorario ", resultado);
 
-        console.log("listHorarios ", listHorarios);
-        console.log("id ", id);
-        console.log("listHorarios ", listHorarios[0].idHorario);
+        // console.log("listHorarios ", listHorarios);
+        // console.log("id ", id);
+        // console.log("listHorarios ", listHorarios[0].idHorario);
 
         const horariosActualizados = listHorarios.filter(
           (h) => h.idHorario !== parseInt(id)

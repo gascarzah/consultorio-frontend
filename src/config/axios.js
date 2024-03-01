@@ -5,6 +5,7 @@ import jwt_decode from "jwt-decode";
 
 
 const clienteAxios = axios.create({
+  // baseURL: 'http://localhost:8090/api/'
   baseURL: 'http://localhost:8080/consultorio/'
 });
 

@@ -8,17 +8,18 @@ import { toast, ToastContainer } from "react-toastify";
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
-import { Alerta } from "../Alerta";
+import { Alerta } from "../../components";
 import { useDispatch, useSelector } from "react-redux";
 import { registrarProgramacion } from "../../slices/programacionSlice";
 import { getEmpleadosPorEmpresa, resetState } from "../../slices/empleadoSlice";
+import { LISTAR_PROGRAMACION, MENSAJE_GUARDADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
 
-const programacionSchema = Yup.object().shape({
+ const programacionSchema = Yup.object().shape({
   fechaInicial: Yup.date().required("Fecha Inicial requerida"),
   fechaFinal: Yup.date().required("Fecha final requerida"),
 });
 
-const ProgramacionForm = () => {
+export const ProgramacionForm = () => {
   const { user } = useSelector((state) => state.usuario);
   const [alerta, setAlerta] = useState({});
   const [monday, setMonday] = useState();
@@ -51,7 +52,14 @@ const ProgramacionForm = () => {
         console.log("resultado ===>> ", resultado);
 
         resetForm();
-        navigate("/dashboard/listar-programacion");
+
+
+        toast.success(MENSAJE_GUARDADO_EXITOSO);
+        dispatch(resetState());
+        setTimeout(() => {
+          navigate(LISTAR_PROGRAMACION);
+        }, TIEMPO_REDIRECCION);
+
       })
       .catch((errores) => {
         console.log("errores ===>> ", errores);
@@ -156,16 +164,16 @@ const ProgramacionForm = () => {
                 <input
                   type="submit"
                   value="Registrar Programacion"
-                  className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+                  className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
                 />
               </div>
             </Form>
           );
         }}
       </Formik>
+      <ToastContainer/>
     </>
   );
 };
 
-export default ProgramacionForm;
+

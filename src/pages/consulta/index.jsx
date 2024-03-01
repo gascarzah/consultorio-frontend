@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { Alerta } from "../../components/Alerta";
+import { Alerta, PreviewConsulta } from "../../components";
 import { useDispatch, useSelector } from "react-redux";
 import { getListaCitados, resetState } from "../../slices/citaSlice";
 
-import PreviewCita from "../../components/PreviewCita";
-import PreviewConsulta from "../../components/PreviewConsulta";
 
 const nuevoClienteSchema = Yup.object().shape({
   idEmpleado: Yup.string().required("Debe seleccionar un medico"),

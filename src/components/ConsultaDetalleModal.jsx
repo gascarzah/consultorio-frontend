@@ -1,6 +1,6 @@
 import React from "react";
 
-const AtencionDetalleModal = ({ informe }) => {
+export const AtencionDetalleModal = ({ informe }) => {
   return (
     <div className="md:flex gap-10">
       <div className="">
@@ -13,4 +13,4 @@ const AtencionDetalleModal = ({ informe }) => {
   );
 };
 
-export default AtencionDetalleModal;
+

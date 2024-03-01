@@ -3,35 +3,38 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-import { toast } from "react-toastify";
-
+import {  ToastContainer, toast } from "react-toastify";
 import {
   modificarHorario,
   registrarHorario,
   resetState,
 } from "../../slices/horarioSlice";
 import { Alerta } from "../Alerta";
+import { TIEMPO_REDIRECCION, MENSAJE_GUARDADO_EXITOSO,MENSAJE_MODIFICADO_EXITOSO, LISTAR_HORARIO } from "../../utils";
 
 const horarioSchema = Yup.object().shape({
   descripcion: Yup.string().required("La descripcion es obligatoria"),
 });
 
-const HorarioForm = ({ horario }) => {
+export const HorarioForm = ({ horario }) => {
+
   const [alerta, setAlerta] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = (values, resetForm) => {
+
     if (!values.idHorario) {
       dispatch(registrarHorario(values))
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
-
+          toast.success(MENSAJE_GUARDADO_EXITOSO);
           dispatch(resetState());
-
-          navigate("/dashboard/listar-horario");
+          setTimeout(() => {
+            navigate(LISTAR_HORARIO);
+          }, TIEMPO_REDIRECCION);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
@@ -42,8 +45,12 @@ const HorarioForm = ({ horario }) => {
         .unwrap()
         .then((resultado) => {
           console.log("resultado modificarCliente ===>> ", resultado);
+          toast.success(MENSAJE_MODIFICADO_EXITOSO);
           dispatch(resetState());
-          navigate("/dashboard/listar-horario");
+          setTimeout(() => {
+            navigate(LISTAR_HORARIO);
+          }, TIEMPO_REDIRECCION);
+          
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
@@ -105,8 +112,8 @@ const HorarioForm = ({ horario }) => {
           );
         }}
       </Formik>
+      <ToastContainer 
+    />
     </>
   );
 };
-
-export default HorarioForm;

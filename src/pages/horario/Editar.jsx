@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { getHorario } from "../../slices/horarioSlice";
-import HorarioForm from "../../components/form/HorarioForm";
+import {HorarioForm} from "../../components";
 const EditarHorario = () => {
   const { id } = useParams();
   const dispatch = useDispatch();

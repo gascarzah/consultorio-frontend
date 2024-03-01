@@ -1,4 +1,4 @@
-import CitaForm from "../../components/form/CitaForm";
+import {CitaForm} from  "../../components";
 
 const AgregarCita = () => {
   return (

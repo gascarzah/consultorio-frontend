@@ -1,5 +1,5 @@
 import React from "react";
-import EmpleadoForm from "../../components/form/EmpleadoForm";
+import {EmpleadoForm} from "../../components";
 
 const AgregarEmpleado = () => {
   return (

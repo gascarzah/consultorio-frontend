@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { getProgramacionDetallePorId } from "../../slices/programacionDetalleSlice";
-import ProgramacionDetalleForm from "../../components/form/ProgramacionDetalleForm";
+import {ProgramacionDetalleForm} from "../../components";
 
 const EditarProgramacionDetalle = () => {
   const { id } = useParams();

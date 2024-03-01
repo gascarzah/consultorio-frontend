@@ -101,7 +101,7 @@ export const getHorarios = createAsyncThunk(
 export const eliminarHorario = createAsyncThunk(
   'eliminarHorario',
   async (id, { rejectWithValue }) => {
-
+  console.log(id)
     try {
       const { data } = await clienteAxios.delete(`/horarios/${id}`);
       return data
@@ -124,8 +124,10 @@ const horarioSlice = createSlice({
         // state.loading = 'grabo'
         state.loading = false
         state.code = 201
-        state.message = 'se encontro'
-
+        state.message = 'se grabo correctamente'
+        
+        
+        
       })
       .addCase(registrarHorario.rejected, (state, { payload }) => {
         console.log('rejected payload', payload)
@@ -172,7 +174,7 @@ const horarioSlice = createSlice({
         // state.loading = 'grabo'
         state.loading = false
         state.code = 201
-        state.message = 'se encontro'
+        state.message = 'se modifico correctamente'
 
       })
       .addCase(modificarHorario.rejected, (state, { payload }) => {

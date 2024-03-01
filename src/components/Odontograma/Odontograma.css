@@ -1,0 +1,5 @@
+.Odontograma {
+    display: flex;
+    flex-direction: row;
+    height: 520px;
+  }

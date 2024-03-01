@@ -22,7 +22,7 @@ const initialState = {
 export const getCitasDelDia = createAsyncThunk(
   'getCitasDelDia',
   async (values, { rejectWithValue }) => {
-    console.log('valroes que llega ==> ', values)
+    // console.log('valroes que llega ==> ', values)
     // return
 
     try {

@@ -3,11 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import { ToastContainer, toast } from "react-toastify";
-import { Alerta } from "../components/Alerta";
+
 import { useDispatch, useSelector } from "react-redux";
 import { registrarUsuario, resetState } from "../slices/usuarioSlice";
 import { getRoles } from "../slices/rolSlice";
 import { getEmpresas } from "../slices/empresaSlice";
+import { Alerta } from "../components";
 
 const nuevoUsuarioSchema = Yup.object().shape({
   nombres: Yup.string().required("El nombre del cliente es obligatorio"),

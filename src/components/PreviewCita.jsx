@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
-const PreviewCita = ({ cita }) => {
+export  const PreviewCita = ({ cita }) => {
   const { rol } = useSelector((state) => state.auth);
   console.log(cita);
   return (
@@ -49,4 +49,4 @@ const PreviewCita = ({ cita }) => {
   );
 };
 
-export default PreviewCita;
+

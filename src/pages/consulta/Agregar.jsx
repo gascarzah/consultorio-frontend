@@ -6,14 +6,13 @@ import Modal from "react-modal";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { Alerta } from "../../components/Alerta";
+import { Alerta, Pagination, AtencionDetalleModal } from "../../components";
 import regeneratorRuntime from "regenerator-runtime";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { getCita, getHistorialCitas, editarCita } from "../../slices/citaSlice";
-import Pagination from "../../components/Pagination";
-import AtencionDetalleModal from "../../components/ConsultaDetalleModal";
+
 
 const customStyles = {
   content: {

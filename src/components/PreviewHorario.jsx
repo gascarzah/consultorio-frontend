@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const PreviewHorario = ({ horario, handleDelete }) => {
-  console.log("horarios que llega", horario);
+export const PreviewHorario = ({ horario, handleDelete }) => {
+  // console.log("horarios que llega", horario);
 
   return (
     <>
@@ -54,4 +54,3 @@ const PreviewHorario = ({ horario, handleDelete }) => {
   );
 };
 
-export default PreviewHorario;

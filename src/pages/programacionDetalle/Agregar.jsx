@@ -1,5 +1,5 @@
 import React from "react";
-import ProgramacionDetalleForm from "../../components/form/ProgramacionDetalleForm";
+import {ProgramacionDetalleForm} from "../../components";
 
 const AgregarProgramacionDetalle = () => {
   return (

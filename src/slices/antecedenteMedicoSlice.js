@@ -4,24 +4,24 @@ import clienteAxios from '../config/axios';
 
 const initialState = {
   loading: '',
-  cliente: {},
+  antecedenteMedico: {},
   code: null,
   message: null,
-  clientes: [],
+  antecedentesMedicos: [],
   total: [],
   prev: null,
   next: null,
   numberPage: 0
 };
 
-export const registrarCliente = createAsyncThunk(
-  'cliente',
+export const registrarAntecedenteMedico = createAsyncThunk(
+  'antecedenteMedico',
   async (values, { rejectWithValue }) => {
 
-    console.log('registrarCliente ', values)
+    console.log('registrarAntecedenteMedico ', values)
 
     try {
-      const { data } = await clienteAxios.post("/clientes", values);
+      const { data } = await clienteAxios.post("/antecedentesMedicos", values);
       return data
     } catch (error) {
       if (error.response && error.response.data.message) {
@@ -34,14 +34,14 @@ export const registrarCliente = createAsyncThunk(
     }
   }
 )
-export const modificarCliente = createAsyncThunk(
-  'modificarCliente',
+export const modificarAntecedenteMedico = createAsyncThunk(
+  'modificarAntecedenteMedico',
   async (values, { rejectWithValue }) => {
 
-    console.log('modificarCliente ', values)
+    console.log('modificarAntecedenteMedico ', values)
 
     try {
-      const { data } = await clienteAxios.put("/clientes", values);
+      const { data } = await clienteAxios.put("/antecedentesMedicos", values);
       return data
     } catch (error) {
       if (error.response && error.response.data.message) {
@@ -55,14 +55,14 @@ export const modificarCliente = createAsyncThunk(
   }
 )
 
-export const getCliente = createAsyncThunk(
-  'getCliente',
+export const getAntecedenteMedico = createAsyncThunk(
+  'getAntecedenteMedico',
   async (id, { rejectWithValue }) => {
 
     try {
-      console.log(id)
-      const { data } = await clienteAxios.get(`/clientes/${id}`);
 
+      const { data } = await clienteAxios.get(`/antecedentesMedicos/${id}`);
+      console.log(data)
       return data
     } catch (error) {
 
@@ -71,13 +71,13 @@ export const getCliente = createAsyncThunk(
   }
 )
 
-export const getClientes = createAsyncThunk(
-  'getClientes',
+export const getAntecedentesMedicos = createAsyncThunk(
+  'getAntecedentesMedicos',
   async (email, { rejectWithValue }) => {
 
     try {
 
-      const { data } = await clienteAxios.get(`/clientes`);
+      const { data } = await clienteAxios.get(`/antecedentesMedicos`);
 
 
       return data
@@ -88,18 +88,20 @@ export const getClientes = createAsyncThunk(
   }
 )
 
-export const getClientesPaginado = createAsyncThunk(
-  'getClientesPaginado',
+export const getAntecedentesMedicosPaginado = createAsyncThunk(
+  'getAntecedentesMedicosPaginado',
   async (values, { rejectWithValue }) => {
 
     try {
-      const { data } = await clienteAxios.get(`/clientes/pageable`,
+      console.log('aca')
+      const { data } = await clienteAxios.get(`/antecedentesMedicos/pageable`,
         {
           params: {
             page: values.page,
             size: values.size,
           }
         });
+        console.log(data)
       return data
     } catch (error) {
       return rejectWithValue(error.response.data)
@@ -107,90 +109,90 @@ export const getClientesPaginado = createAsyncThunk(
   }
 )
 
-const clienteSlice = createSlice({
-  name: 'cliente',
+const antecedenteMedicoSlice = createSlice({
+  name: 'antecedenteMedico',
   initialState,
   reducers: { resetState: () => initialState, },
   // reducers: {},
   extraReducers(builder) {
     builder
       // .addCase(revertAll, () => initialState)
-      .addCase(registrarCliente.pending, (state, action) => {
+      .addCase(registrarAntecedenteMedico.pending, (state, action) => {
         state.loading = true
       })
-      .addCase(registrarCliente.fulfilled, (state, { payload }) => {
+      .addCase(registrarAntecedenteMedico.fulfilled, (state, { payload }) => {
         console.log('fulfilled payload', payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message
       })
-      .addCase(registrarCliente.rejected, (state, { payload }) => {
-        console.log('registrarCliente.rejected payload', payload)
+      .addCase(registrarAntecedenteMedico.rejected, (state, { payload }) => {
+        console.log('registrarAntecedenteMedico.rejected payload', payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message
       })
-      .addCase(modificarCliente.pending, (state, action) => {
+      .addCase(modificarAntecedenteMedico.pending, (state, action) => {
         state.loading = true
       })
-      .addCase(modificarCliente.fulfilled, (state, { payload }) => {
-        console.log('fulfilled modificarCliente', payload)
+      .addCase(modificarAntecedenteMedico.fulfilled, (state, { payload }) => {
+        console.log('fulfilled modificarAntecedenteMedico', payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message
       })
-      .addCase(modificarCliente.rejected, (state, { payload }) => {
-        console.log('modificarCliente.rejected payload', payload)
+      .addCase(modificarAntecedenteMedico.rejected, (state, { payload }) => {
+        console.log('modificarAntecedenteMedico.rejected payload', payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message
       })
-      .addCase(getCliente.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getCliente payload', payload)
+      .addCase(getAntecedenteMedico.fulfilled, (state, { payload }) => {
+        console.log('fulfilled getAntecedenteMedico payload', payload)
         // state.loading = 'grabo'
         state.loading = false
         state.code = 201
         state.message = 'se encontro'
-        state.cliente = {
-          id: payload.idCliente,
+        state.antecedenteMedico = {
+          id: payload.numeroAntecedenteMedico,
           email: payload.email,
           nombreCompleto: payload.apellidoPaterno + ' ' +
             payload.apellidoMaterno + ', ' +
             payload.nombres
         }
       })
-      .addCase(getCliente.rejected, (state, { payload }) => {
+      .addCase(getAntecedenteMedico.rejected, (state, { payload }) => {
         console.log('rejected payload', payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message
       })
-      .addCase(getClientes.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getCliente payload', payload)
+      .addCase(getAntecedentesMedicos.fulfilled, (state, { payload }) => {
+        console.log('fulfilled getAntecedenteMedico payload', payload)
         // state.loading = 'grabo'
         state.loading = false
         state.code = 201
         state.message = 'se encontro'
-        state.clientes = payload
+        state.antecedentemedicos = payload
       })
-      .addCase(getClientes.rejected, (state, { payload }) => {
+      .addCase(getAntecedentesMedicos.rejected, (state, { payload }) => {
         console.log('rejected payload', payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message
       })
-      .addCase(getClientesPaginado.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getCliente payload', payload)
+      .addCase(getAntecedentesMedicosPaginado.fulfilled, (state, { payload }) => {
+        console.log('fulfilled getAntecedentesMedicosPaginado payload', payload)
         state.loading = false
         state.code = 201
         state.message = 'se encontro'
-        state.clientes = payload.content
+        state.antecedentesMedicos = payload.content
         state.total = payload.totalElements
         state.prev = payload.first
         state.next = payload.last
         state.numberPage = payload.number
       })
-      .addCase(getClientesPaginado.rejected, (state, { payload }) => {
+      .addCase(getAntecedentesMedicosPaginado.rejected, (state, { payload }) => {
         state.loading = false
         state.code = payload.status
         state.message = payload.message
@@ -199,6 +201,6 @@ const clienteSlice = createSlice({
 })
 
 
-export const { resetState } = clienteSlice.actions
+export const { resetState } = antecedenteMedicoSlice.actions
 
-export default clienteSlice.reducer
+export default antecedenteMedicoSlice.reducer

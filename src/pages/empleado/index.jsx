@@ -3,14 +3,10 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Modal from "react-modal";
 import { getEmpleadosPaginado } from "../../slices/empleadoSlice";
-import PreviewCita from "../../components/PreviewCita";
-import PreviewEmpresa from "../../components/PreviewCliente";
 
-import PreviewCliente from "../../components/PreviewCliente";
 
 import { Link, Outlet } from "react-router-dom";
-import Pagination from "../../components/Pagination";
-import PreviewEmpleado from "../../components/PreviewEmpleado";
+import {Pagination,PreviewEmpleado} from "../../components";
 
 const customStyles = {
   content: {

@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 import { registrarEmpleado } from "../../slices/empleadoSlice";
 import { Alerta } from "../Alerta";
+import { LISTAR_EMPLEADO, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
 
-const empleadoSchema = Yup.object().shape({
+ const empleadoSchema = Yup.object().shape({
   nombres: Yup.string().required("El nombre del cliente es obligatorio"),
   apellidoPaterno: Yup.string().required("Apellido Paterno obligatorio"),
   apellidoMaterno: Yup.string().required("Apellido Materno obligatorio"),
@@ -23,7 +24,7 @@ const empleadoSchema = Yup.object().shape({
   idTipoEmpleado: Yup.string().required("Tipo empleado obligatorio"),
 });
 
-const EmpleadoForm = ({ cliente }) => {
+export const EmpleadoForm = ({ cliente }) => {
   const [alerta, setAlerta] = useState({});
   const [listTipoEmpleados, setListTipoEmpleados] = useState({});
 
@@ -34,7 +35,7 @@ const EmpleadoForm = ({ cliente }) => {
     dispatch(getTipoEmpleados())
       .unwrap()
       .then((resultado) => {
-        console.log("resultado getTipoEmpleados ===>> ", resultado);
+        // console.log("resultado getTipoEmpleados ===>> ", resultado);
         setListTipoEmpleados(resultado);
       })
       .catch((errores) => {
@@ -50,24 +51,32 @@ const EmpleadoForm = ({ cliente }) => {
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
-          navigate("/dashboard/listar-empleado");
+          toast.success(MENSAJE_GUARDADO_EXITOSO);
+          dispatch(resetState());
+          setTimeout(() => {
+            navigate(LISTAR_EMPLEADO);
+          }, TIEMPO_REDIRECCION);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
           toast.error(errores.message);
         });
     } else {
-      // dispatch(modificarEmpleado(values))
-      //   .unwrap()
-      //   .then((resultado) => {
-      //     console.log("resultado modificarCliente ===>> ", resultado);
-      //     dispatch(resetState());
-      //     navigate("/dashboard/listar-empleado");
-      //   })
-      //   .catch((errores) => {
-      //     console.log("errores ===>> ", errores);
-      //     toast.error(errores.message);
-      //   });
+      dispatch(modificarEmpleado(values))
+        .unwrap()
+        .then((resultado) => {
+          console.log("resultado modificarCliente ===>> ", resultado);
+          dispatch(resetState());
+          toast.success(MENSAJE_MODIFICADO_EXITOSO);
+          dispatch(resetState());
+          setTimeout(() => {
+            navigate(LISTAR_EMPLEADO);
+          }, TIEMPO_REDIRECCION);
+        })
+        .catch((errores) => {
+          console.log("errores ===>> ", errores);
+          toast.error(errores.message);
+        });
     }
   };
 
@@ -223,8 +232,9 @@ const EmpleadoForm = ({ cliente }) => {
           );
         }}
       </Formik>
+      <ToastContainer/>
     </>
   );
 };
 
-export default EmpleadoForm;
+

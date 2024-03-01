@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
+
 
 import "react-toastify/dist/ReactToastify.css";
+import { Header, Sidebar } from "../components";
 
 const RutaProtegida = ({ props }) => {
   const { logged } = useSelector((state) => state.auth);

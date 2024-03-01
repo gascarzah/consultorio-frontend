@@ -17,6 +17,7 @@ import {
   registrarProgramacionDetalle,
 } from "../../slices/programacionDetalleSlice";
 import { getProgramacionActivo } from "../../slices/programacionSlice";
+import { LISTAR_PROGRAMACION_DETALLE, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
 
 registerLocale("es", es);
 
@@ -24,7 +25,7 @@ const programacionDetalleSchema = Yup.object().shape({
   numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
 });
 
-const ProgramacionDetalleForm = ({ programacionDetalle }) => {
+export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
   console.log("ProgramacionDetalleForm llega ", programacionDetalle);
   const { empleados } = useSelector((state) => state.empleado);
   const { user } = useSelector((state) => state.usuario);
@@ -111,10 +112,12 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
           console.log("resultado ===>> ", resultado);
           console.log("redirecciona login");
 
-          toast.success("Se registro con exito");
           resetForm();
-
-          navigate("/dashboard/listar-programacion-detalle");
+          toast.success(MENSAJE_GUARDADO_EXITOSO);
+          dispatch(resetState());
+          setTimeout(() => {
+            navigate(LISTAR_PROGRAMACION_DETALLE);
+          }, TIEMPO_REDIRECCION);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
@@ -128,11 +131,12 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
           console.log("redirecciona login");
-
-          toast.success("Se registro con exito");
           resetForm();
-
-          navigate("/dashboard/listar-programacion-detalle");
+          toast.success(MENSAJE_MODIFICADO_EXITOSO);
+          dispatch(resetState());
+          setTimeout(() => {
+            navigate(LISTAR_PROGRAMACION_DETALLE);
+          }, TIEMPO_REDIRECCION);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
@@ -323,8 +327,9 @@ const ProgramacionDetalleForm = ({ programacionDetalle }) => {
           );
         }}
       </Formik>
+      <ToastContainer/>
     </>
   );
 };
 
-export default ProgramacionDetalleForm;
+
