@@ -1,23 +1,24 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Modal from "react-modal";
+// import Modal from "react-modal";
 import { getEmpleadosPaginado } from "../../slices/empleadoSlice";
 
 
 import { Link, Outlet } from "react-router-dom";
 import {Pagination,PreviewEmpleado} from "../../components";
+import { ITEMS_POR_PAGINA } from "../../utils";
 
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    transform: "translate(-50%, -50%)",
-  },
-};
-Modal.setAppElement("#root");
+// const customStyles = {
+//   content: {
+//     top: "50%",
+//     left: "50%",
+//     right: "auto",
+//     bottom: "auto",
+//     transform: "translate(-50%, -50%)",
+//   },
+// };
+// Modal.setAppElement("#root");
 const ListarEmpleado = () => {
   const { empleados, prev, next, total } = useSelector(
     (state) => state.empleado
@@ -148,7 +149,7 @@ const ListarEmpleado = () => {
             )}
           </tbody>
         </table>
-        {total > 5 && (
+        {total && total > ITEMS_POR_PAGINA && (
           <Pagination
             totalPosts={listEmpleados.length}
             itemsPerPage={itemsPerPage}
@@ -164,7 +165,7 @@ const ListarEmpleado = () => {
         )}
       </div>
 
-      {modal && (
+      {/* {modal && (
         <Modal
           isOpen={modal}
           style={customStyles}
@@ -173,7 +174,7 @@ const ListarEmpleado = () => {
         >
           <AgregarCliente />
         </Modal>
-      )}
+      )} */}
     </>
   );
 };

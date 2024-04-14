@@ -32,7 +32,7 @@ export const ClienteForm = ({ cliente, handleSubmit, handleGetCliente }) => {
 
       <Formik
         initialValues={{
-          idCliente: cliente?.idCliente,
+          historiaClinica: cliente?.historiaClinica,
           nombres: cliente?.nombres,
           apellidoPaterno: cliente?.apellidoPaterno,
           apellidoMaterno: cliente?.apellidoMaterno,
@@ -51,6 +51,25 @@ export const ClienteForm = ({ cliente, handleSubmit, handleGetCliente }) => {
           return (
             <Form className=" my-10 bg-white shadow rounded p-10 w-1/2">
               <div className="w-full">
+
+              <div className="my-3   ">
+                  <label
+                    htmlFor="historiaClinica"
+                    className="uppercase text-gray-600 block font-bold"
+                  >
+                    Historia Clinica
+                  </label>
+                  <Field
+                    id="historiaClinica"
+                    type="text"
+                    placeholder="Historia Clinica"
+                    className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
+                    name={"historiaClinica"}
+                    
+                  />
+
+                </div>
+
                 <div className="my-3">
                   <label
                     htmlFor="numeroDocumento"

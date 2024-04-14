@@ -29,12 +29,12 @@ export const Sidebar = () => {
             {item.menu.nombre}
           </Link>
         ))}
-<Link
+{/* <Link
           to={"ficha-medica"}
           className="bg-sky-600 w-full p-3 text-white uppercase font-bold block mt-5 text-center rounded-lg"
         >
           Ficha clinica
-        </Link>
+        </Link> */}
    
         {/* <Link
           to={"listar-horario"}

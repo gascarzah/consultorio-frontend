@@ -1,4 +1,8 @@
-import {CitaForm} from  "../../components";
+import {CitaForm, MyCalendar} from  "../../components";
+// import MyCalendar from "../../components/MyCalendar";
+
+
+
 
 const AgregarCita = () => {
   return (
@@ -7,7 +11,8 @@ const AgregarCita = () => {
         Registrar Cita
       </h1>
 
-      <CitaForm />
+      {/* <CitaForm /> */}
+      <MyCalendar/>
     </>
   );
 };

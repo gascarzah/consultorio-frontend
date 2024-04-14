@@ -16,64 +16,10 @@ import { modificarAntecedenteMedico, registrarAntecedenteMedico, resetState } fr
 
 
 
-// const antecedenteMedicoSchema = Yup.object().shape({
-//   nombres: Yup.string().required("El nombre del paciente es obligatorio"),
-//   apellidoPaterno: Yup.string().required("Apellido Paterno obligatorio"),
-//   apellidoMaterno: Yup.string().required("Apellido Materno obligatorio"),
-//   numeroDocumento: Yup.string()
-//     .max(8, "Numero de documento debe tener solo 8 digitos")
-//     .required("Dni es obligatorio")
-//     .matches(/^[0-9]+$/, "Dni debe tener solo numeros"),
-//   email: Yup.string()
-//     .email("Email no valido")
-//     .required("El email es obligatorio"),
-//   direccion: Yup.string().required("Direccion obligatorio"),
-// });
-
 export const AntecedenteMedicoForm = ({ antecedenteMedico,handleSubmit }) => {
  
   const [alerta, setAlerta] = useState({});
-  
 
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
-
-  // const handleSubmit = (values, resetForm) => {
-  //   console.log('antecedenteMedico init',antecedenteMedico)
-  //   if (Object.keys(antecedenteMedico).length === 0) {
-  //     console.log("antecedenteMedico registrarAntecedenteMedico")
-  //     dispatch(registrarAntecedenteMedico(values))
-  //       .unwrap()
-  //       .then((resultado) => {
-  //         console.log("resultado registrarAntecedenteMedico ===>> ", resultado);
-  //         toast.success(MENSAJE_GUARDADO_EXITOSO);
-  //         dispatch(resetState());
-  //         setTimeout(() => {
-  //           navigate(LISTAR_ANTECEDENTEMEDICO);
-  //         }, TIEMPO_REDIRECCION);
-  //       })
-  //       .catch((errores) => {
-  //         console.log("errores ===>> ", errores);
-  //         toast.error(errores.message);
-  //       });
-  //   } else {
-  //     console.log("antecedenteMedico modificarAntecedenteMedico")
-  //     dispatch(modificarAntecedenteMedico(values))
-  //       .unwrap()
-  //       .then((resultado) => {
-  //         console.log("resultado modificarAntecedenteMedico ===>> ", resultado);
-  //         toast.success(MENSAJE_MODIFICADO_EXITOSO);
-  //         dispatch(resetState());
-  //         setTimeout(() => {
-  //           navigate(LISTAR_ANTECEDENTEMEDICO);
-  //         }, TIEMPO_REDIRECCION);
-  //       })
-  //       .catch((errores) => { 
-  //         console.log("errores ===>> ", errores);
-  //         toast.error(errores.message);
-  //       });
-  //   }
-  // };
 
   const { msg } = alerta;
 

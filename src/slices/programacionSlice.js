@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
 import clienteAxios from '../config/axios';
-import { registrarEmpleado } from './empleadoSlice';
+
 
 
 const initialState = {
@@ -71,11 +71,23 @@ export const getProgramacionActivo = createAsyncThunk(
   }
 )
 
+export const eliminarProgramacion = createAsyncThunk(
+  'eliminarHorario',
+  async (id, { rejectWithValue }) => {
+  console.log(id)
+    try {
+      const { data } = await clienteAxios.delete(`/programaciones/${id}`);
+      return data
+    } catch (error) {
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
+
 const programacionSlice = createSlice({
   name: 'programacion',
   initialState,
   reducers: { resetState: () => initialState, },
-  reducers: {},
   extraReducers(builder) {
     builder
       // .addCase(revertAll, () => initialState)
@@ -124,6 +136,20 @@ const programacionSlice = createSlice({
         state.loading = false
         state.code = payload.status
         state.message = payload.message
+      })
+      .addCase(eliminarProgramacion.fulfilled, (state, { payload }) => {
+        console.log('se elimino correctamente', payload)
+        // state.loading = 'grabo'
+        state.loading = false
+        state.code = 201
+        state.message = 'se encontro'
+      })
+      .addCase(eliminarProgramacion.rejected, (state, { payload }) => {
+        console.log('rejected payload', payload)
+        state.loading = false
+        state.code = payload.status
+        state.message = payload.message
+
       })
     // })
   }

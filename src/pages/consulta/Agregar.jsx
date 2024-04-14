@@ -424,6 +424,7 @@ const AgregarConsulta = () => {
               </div>
             </div>
           </div>
+          {total && total > ITEMS_POR_PAGINA && ( 
           <Pagination
             totalPosts={listaHistorial.length}
             itemsPerPage={itemsPerPage}
@@ -436,6 +437,7 @@ const AgregarConsulta = () => {
             disabledNext={disabledNext}
             setDisabledNext={setDisabledNext}
           />
+          )}
         </div>
 
         {modal && (

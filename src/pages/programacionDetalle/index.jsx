@@ -5,68 +5,29 @@ import { toast } from "react-toastify";
 import {Pagination,PreviewProgramacionDetalle} from "../../components";
 import { Link, useNavigate } from "react-router-dom";
 import { getProgramacionesDetallePaginado } from "../../slices/programacionDetalleSlice";
+import { usePagination } from "../../hook/usePagination";
+import { TableHeader } from "../../components/TableHeader";
+import { ITEMS_POR_PAGINA } from "../../utils";
+
+
+const headers = ['Dia','Fecha','Doctor', 'Registrados','acciones']
 
 const ListarProgramacionDetalle = () => {
   const { programacionesDetalle, prev, next, total } = useSelector(
     (state) => state.programacionDetalle
   );
-  const dispatch = useDispatch();
 
-  const [listProgramacionesDetalle, setListProgramacionesDetalle] = useState(
-    []
-  );
-
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [disabledPrev, setDisabledPrev] = useState(false);
-  const [disabledNext, setDisabledNext] = useState(false);
-
-  useEffect(() => {
-    dispatch(
-      getProgramacionesDetallePaginado({
-        page: currentPage,
-        size: itemsPerPage,
-      })
-    );
-  }, []);
-
-  useEffect(() => {
-    if (programacionesDetalle) {
-      setListProgramacionesDetalle(programacionesDetalle);
-      setDisabledPrev(prev);
-      setDisabledNext(next);
-    } else {
-      setListProgramacionesDetalle([]);
-    }
-  }, [programacionesDetalle, currentPage]);
-
-  const handlePrev = () => {
-    console.log("handlePrev ", handlePrev);
-    if (!disabledPrev) {
-      const pagina = currentPage - 1;
-      setCurrentPage(currentPage - 1);
-      console.log("pagPrev ", currentPage);
-      pagination(pagina);
-    }
-  };
-  const handleNext = () => {
-    console.log("disabledNext ", disabledNext);
-    if (!disabledNext) {
-      const pagina = currentPage + 1;
-      setCurrentPage(pagina);
-      console.log("pagNext ", currentPage);
-      pagination(pagina);
-    }
-  };
-
-  const pagination = (pagina) => {
-    dispatch(
-      getProgramacionesDetallePaginado({
-        page: pagina,
-        size: itemsPerPage,
-      })
-    );
-  };
+  const { handlePrev,
+    handleNext,
+    currentPage,
+    setCurrentPage,
+    listElementos,
+    setListElementos,
+    itemsPerPage,
+    disabledPrev, 
+    setDisabledPrev,
+    disabledNext,
+    setDisabledNext } = usePagination(programacionesDetalle, prev, next, getProgramacionesDetallePaginado)
 
   return (
     <>
@@ -80,48 +41,11 @@ const ListarProgramacionDetalle = () => {
         </Link>
 
         <table className="min-w-full divide-y divide-gray-200 mt-4">
-          <thead className="bg-gray-50">
-            <tr>
-              {/* <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                #
-              </th> */}
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Dia
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Fecha
-              </th>
-
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Doctor
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Registrados
-              </th>
-            </tr>
-          </thead>
+        <TableHeader headers={headers}/>
           <tbody className="divide-y divide-gray-200">
-            {/* {console.log(
-              "listProgramacionesDetalle == > ",
-              listProgramacionesDetalle
-            )} */}
-            {listProgramacionesDetalle.length ? (
-              listProgramacionesDetalle.map((programacionDetalle) => (
+
+            {listElementos.length ? (
+              listElementos.map((programacionDetalle) => (
                 <PreviewProgramacionDetalle
                   key={programacionDetalle.idProgramacionDetalle}
                   programacionDetalle={programacionDetalle}
@@ -138,9 +62,9 @@ const ListarProgramacionDetalle = () => {
             )}
           </tbody>
         </table>
-        {total > 5 && (
+        {total && total > ITEMS_POR_PAGINA && (
           <Pagination
-            totalPosts={listProgramacionesDetalle.length}
+            totalPosts={listElementos.length}
             itemsPerPage={itemsPerPage}
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}

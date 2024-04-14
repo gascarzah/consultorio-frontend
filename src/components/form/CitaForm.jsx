@@ -17,7 +17,9 @@ import { getProgramacionDetalles } from "../../slices/programacionDetalleSlice";
 
 import { getHorarios } from "../../slices/horarioSlice";
 import { getClientes } from "../../slices/clienteSlice";
-import { LISTAR_CITA, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
+import { LISTAR_CITA, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, SWEET_GUARDO, SWEET_MODIFICO, SWEET_SUCESS, SweetCrud, TIEMPO_REDIRECCION } from "../../utils";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 const nuevaCitaSchema = Yup.object().shape({
   numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
@@ -40,6 +42,10 @@ export const CitaForm = ({ cita }) => {
   const [clientes, setClientes] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [value, onChange] = useState(new Date());
+
+
   useEffect(() => {
     dispatch(resetState());
   }, []);
@@ -85,7 +91,7 @@ export const CitaForm = ({ cita }) => {
         //console.log("resultado de resultado ", resultado);
         setClientes(resultado);
         const manyItems = resultado.map((cliente, i) => ({
-          id: cliente.numeroDocumento,
+          id: cliente.historiaClinica,
           name:
             cliente.apellidoPaterno +
             " " +
@@ -94,6 +100,7 @@ export const CitaForm = ({ cita }) => {
             cliente.nombres,
         }));
 
+        console.log(manyItems)
         setListaClientes(manyItems);
       })
       .catch((errores) => {
@@ -105,53 +112,38 @@ export const CitaForm = ({ cita }) => {
   }, [dispatch]);
 
   const handleSubmit = (values, resetForm) => {
-    //console.log("Cita handleSubmit valores ===>> ", values);
-    //console.log("Cita  ===>> ", cita);
+console.log('si esta activo ',values)
     if (cita) {
       dispatch(
         editarCita({
           ...values,
-          numeroDocumento: values.numeroDocumentoCliente,
+          historiaClinica: values.historiaClinica,
           atendido: false,
         })
       )
         .unwrap()
         .then((resultado) => {
-          //console.log("Cita handleSubmit resultado ===>> ", resultado);
-          //console.log("Cita handleSubmit redirecciona login");
-          // resetForm();
-          toast.success(MENSAJE_GUARDADO_EXITOSO);
-          dispatch(resetState());
-          setTimeout(() => {
-            navigate(LISTAR_CITA);
-          }, TIEMPO_REDIRECCION);
-
-
+          SweetCrud(SWEET_MODIFICO,SWEET_SUCESS)
+          navigate(LISTAR_CITA);
         })
         .catch((errores) => {
           console.log("Cita handleSubmit errores ===>> ", errores);
-          toast.error(errores.message);
+          
         });
     } else {
+
       const valores = {
         ...values,
-        numeroDocumento: cliente.id,
+        historiaClinica: cliente.id,
         atendido: false,
       };
-      //console.log("handleSubmit citaForm values ", valores);
+
 
       dispatch(registrarCita(valores))
         .unwrap()
         .then((resultado) => {
-          //console.log("Cita handleSubmit resultado ===>> ", resultado);
-          //console.log("Cita handleSubmit redirecciona login");
-             // resetForm();
-             toast.success(MENSAJE_MODIFICADO_EXITOSO);
-             dispatch(resetState());
-             setTimeout(() => {
-               navigate(LISTAR_CITA);
-             }, TIEMPO_REDIRECCION);
-            
+          SweetCrud(SWEET_GUARDO,SWEET_SUCESS) 
+          navigate(LISTAR_CITA);
         })
         .catch((errores) => {
           console.log("Cita handleSubmit errores ===>> ", errores);
@@ -264,7 +256,7 @@ export const CitaForm = ({ cita }) => {
           idProgramacionDetalle:
             cita?.programacionDetalle?.idProgramacionDetalle ?? "",
           idHorario: cita?.horario?.idHorario ?? "",
-          numeroDocumentoCliente: cita?.cliente?.numeroDocumento ?? "",
+          historiaClinica: cita?.cliente?.historiaClinica ?? "",
         }}
         enableReinitialize={true}
         onSubmit={(values, { resetForm }) => {
@@ -277,7 +269,7 @@ export const CitaForm = ({ cita }) => {
           return (
             <Form className="my-10 bg-white shadow rounded p-10 w-2/5 flex flex-col ">
               {console.log("errors ==>> ", errors)}
-              {console.log("values ==>> ", values)}
+              {console.log("values ==>> ", values)} 
               <div className="my-3 ">
                 <label
                   htmlFor="numeroDocumento"
@@ -319,6 +311,10 @@ export const CitaForm = ({ cita }) => {
                   <Alerta msg={errors.numeroDocumento} error={true} />
                 ) : null}
               </div>
+
+                  {/* <div className="my-3">
+                  <Calendar onChange={onChange} value={value} minDate={value} /> */}
+                  {/* </div> */}
 
               <div className="my-3">
                 <label
@@ -407,14 +403,17 @@ export const CitaForm = ({ cita }) => {
                 </label>
 
                 {cita ? (
+                  
                   <div className="my-3">
                     <select
-                      name="numeroDocumentoCliente"
-                      value={values.numeroDocumentoCliente}
+                      name="historiaClinica"
+                      value={values.historiaClinica}
                       // onChange={values.handleChange}
                       onChange={async (e) => {
+                        console.log('historia clinica va', values)
                         const { value } = e.target;
-                        setFieldValue("numeroDocumentoCliente", value);
+                        console.log('historia clinica', value)
+                        setFieldValue("historiaClinica", value);
                       }}
                       className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
                     >
@@ -424,8 +423,8 @@ export const CitaForm = ({ cita }) => {
                       {clientes?.map((item, index) => {
                         return (
                           <option
-                            key={item.numeroDocumento}
-                            value={item.numeroDocumento}
+                            key={item.historiaClinica}
+                            value={item.historiaClinica}
                           >
                             {item.apellidoPaterno +
                               " " +
@@ -461,7 +460,7 @@ export const CitaForm = ({ cita }) => {
           );
         }}
       </Formik>
-      <ToastContainer/>
+      
     </>
   );
 };

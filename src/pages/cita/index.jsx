@@ -1,82 +1,37 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Modal from "react-modal";
-import { Link, Outlet } from "react-router-dom";
-import { getCitasPaginado } from "../../slices/citaSlice";
+
+import {  useDispatch, useSelector } from "react-redux";
+
+import { Link } from "react-router-dom";
+import { getCitasPaginado, resetState } from "../../slices/citaSlice";
 
 import {Pagination,PreviewCita} from "../../components";
+import { usePagination } from "../../hook/usePagination";
+import { TableHeader } from "../../components/TableHeader";
+import { ITEMS_POR_PAGINA } from "../../utils";
 
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    transform: "translate(-50%, -50%)",
-  },
-};
-Modal.setAppElement("#root");
+
+const headers = ['Dia','Fecha','Horario','Cliente','Doctor','Especialidad','Acciones']
+
 const ListarCita = () => {
-  const { citas, prev, next, total } = useSelector((state) => state.cita);
-  const [listCitas, setListCitas] = useState([]);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [disabledPrev, setDisabledPrev] = useState(false);
-  const [disabledNext, setDisabledNext] = useState(false);
-  const [modal, setModal] = useState(false);
+  const { citas, prev, next, total, resetState } = useSelector((state) => state.cita);
 
-  useEffect(() => {
-    dispatch(getCitasPaginado({ page: currentPage, size: itemsPerPage }));
-  }, []);
 
-  useEffect(() => {
-    if (citas) {
-      setListCitas(citas);
-      setDisabledPrev(prev);
-      setDisabledNext(next);
-    }
-  }, [citas, currentPage]);
-
-  const handlePrev = () => {
-    console.log("handlePrev ", handlePrev);
-    if (!disabledPrev) {
-      const pagina = currentPage - 1;
-      setCurrentPage(currentPage - 1);
-      console.log("pagPrev ", currentPage);
-      pagination(pagina);
-    }
-  };
-  const handleNext = () => {
-    console.log("disabledNext ", disabledNext);
-    if (!disabledNext) {
-      const pagina = currentPage + 1;
-      setCurrentPage(pagina);
-      console.log("pagNext ", currentPage);
-      pagination(pagina);
-    }
-  };
-
-  const pagination = (pagina) => {
-    dispatch(
-      getCitasPaginado({
-        page: pagina,
-        size: itemsPerPage,
-      })
-    );
-  };
-
-  const handleChangeModal = (informe) => {
-    setModal(!modal);
-    setInforme(informe);
-  };
-  function closeModal() {
-    setModal(false);
-  }
-
-  const dispatch = useDispatch();
-
+   
+  const { handlePrev,
+    handleNext,
+    currentPage, 
+    setCurrentPage,
+    listElementos,
+    setListElementos,
+    itemsPerPage,
+    disabledPrev,
+    setDisabledPrev,
+    disabledNext,
+    setDisabledNext } = usePagination(citas, prev, next, getCitasPaginado)
+  
+   
+  
   return (
     <>
       <div className=" my-10 bg-white shadow rounded p-10 flex flex-col w-3/4  ">
@@ -88,55 +43,11 @@ const ListarCita = () => {
         </Link>
 
         <table className="min-w-full divide-y divide-gray-200 mt-4">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Dia
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Fecha
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Horario
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Cliente
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Doctor
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Especialidad
-              </th>
-
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-right text-gray-500 uppercase "
-              ></th>
-            </tr>
-          </thead>
+        <TableHeader headers={headers}/>
           <tbody className="divide-y divide-gray-200">
-            {console.log("listCitas == > ", listCitas)}
-            {listCitas.length ? (
-              listCitas.map((cita) => (
+            {console.log("listElementos == > ", listElementos)}
+            {listElementos.length ? (
+              listElementos.map((cita) => (
                 <PreviewCita key={cita.idCita} cita={cita} />
               ))
             ) : (
@@ -150,9 +61,9 @@ const ListarCita = () => {
             )}
           </tbody>
         </table>
-        {total > 5 && (
+        {total && total > ITEMS_POR_PAGINA && (
           <Pagination
-            totalPosts={listCitas.length}
+            totalPosts={listElementos.length}
             itemsPerPage={itemsPerPage}
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}
@@ -166,16 +77,7 @@ const ListarCita = () => {
         )}
       </div>
 
-      {/* {modal && (
-        <Modal
-          isOpen={modal}
-          style={customStyles}
-          onRequestClose={closeModal}
-          contentLabel="Detalle 24/09/2021"
-        >
-          <AgregarCliente />
-        </Modal>
-      )} */}
+
     </>
   );
 };

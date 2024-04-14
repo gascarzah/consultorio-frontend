@@ -7,9 +7,9 @@ export const PreviewHorario = ({ horario, handleDelete }) => {
   return (
     <>
       <tr>
-        <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
+        {/* <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
           {horario.idHorario}
-        </td>
+        </td> */}
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
           {horario.descripcion}
         </td>

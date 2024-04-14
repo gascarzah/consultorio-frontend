@@ -10,6 +10,10 @@ import {
   LISTAR_CLIENTE,
   MENSAJE_GUARDADO_EXITOSO,
   MENSAJE_MODIFICADO_EXITOSO,
+  SWEET_GUARDO,
+  SWEET_MODIFICO,
+  SWEET_SUCESS,
+  SweetCrud,
   TIEMPO_REDIRECCION,
 } from "../../utils";
 
@@ -18,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import { getFichaMedica } from '../../slices/fichaMedicaSlice';
+import OdontogramaChatgpt from '../../components/Odontograma/OdontogramaChatgpt';
 
 
 const tabs = [
@@ -47,8 +52,9 @@ const FichaMedica = () => {
 
 
     const handleGetCliente = (numeroDocumento) => {
-      if(numeroDocumento){
       console.log(numeroDocumento)
+      if(numeroDocumento){
+      
       dispatch(getFichaMedica(numeroDocumento))
       .unwrap()
       .then((resultado) => {
@@ -65,23 +71,27 @@ const FichaMedica = () => {
     }
 
     const handleSubmitCliente = (values, resetForm) => {
-      if (Object.keys(cliente).length === 0) {
+      console.log(values)
+      console.log(!values?.historiaClinica)
+      if (!values?.historiaClinica) {
+        console.log('grabar')
         dispatch(registrarCliente(values))
           .unwrap()
           .then((resultado) => {
             setCliente(resultado)
-            toast.success(MENSAJE_GUARDADO_EXITOSO);
+            SweetCrud(SWEET_GUARDO,SWEET_SUCESS)
 
           })
           .catch((errores) => {
             toast.error(errores.message);
           });
       } else {
+        console.log('modificar')
         dispatch(modificarCliente(values))
           .unwrap()
           .then((resultado) => {
             setCliente(resultado)
-            toast.success(MENSAJE_MODIFICADO_EXITOSO);
+            SweetCrud(SWEET_MODIFICO,SWEET_SUCESS)
           })
           .catch((errores) => {
             toast.error(errores.message);
@@ -93,23 +103,30 @@ const FichaMedica = () => {
    
   
     const handleSubmitAntecedenteMedico = (values, resetForm) => {
-      if (Object.keys(antecedenteMedico).length === 0) {
+      console.log('values.idAntecedenteMedico ',values.idAntecedenteMedico)
+      
+      if (!values?.idAntecedenteMedico ) {
+        console.log('paso1')
         dispatch(registrarAntecedenteMedico({...values, numeroDocumento:cliente?.numeroDocumento}))
           .unwrap()
           .then((resultado) => {
-            toast.success(MENSAJE_GUARDADO_EXITOSO);
+            console.log('SWEET_GUARDO', resultado)
+            SweetCrud(SWEET_GUARDO,SWEET_SUCESS)
             setAntecedenteMedico(resultado)
+            console.log('f SWEET_GUARDO')
           })
           .catch((errores) => {
-            toast.error(errores.message);
+            toast.error(errores.message); 
           });
       } else {
-        
-        dispatch(modificarAntecedenteMedico(values))
-          .unwrap()
+        console.log('paso12 ',values)
+        dispatch(modificarAntecedenteMedico({...values, numeroDocumento:cliente?.numeroDocumento}))
+          .unwrap() 
           .then((resultado) => {
-            toast.success(MENSAJE_MODIFICADO_EXITOSO);
+            console.log('SWEET_MODIFICO')
+            SweetCrud(SWEET_MODIFICO,SWEET_SUCESS)
             setAntecedenteMedico(resultado)
+            console.log('f SWEET_MODIFICO')
           })
           .catch((errores) => { 
             toast.error(errores.message);
@@ -136,9 +153,9 @@ const FichaMedica = () => {
 
       <div className='w-full'>
       <div className="sm:hidden">
-        <label htmlFor="tabs" className="sr-only">
+        {/* <label htmlFor="tabs" className="sr-only">
           Select a tab
-        </label>
+        </label> */}
         {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
         <select
           id="tabs"
@@ -153,7 +170,7 @@ const FichaMedica = () => {
       </div>
       <div className="hidden sm:block ">
         <div className="border-b border-gray-200 ">
-          <nav className="-mb-px flex space-x-8  " aria-label="Tabs">
+          <nav className="-mb-px flex space-x-8 cursor-pointer " aria-label="Tabs">
             {tabs.map((tab) => (
               <div
                 key={tab.name}
@@ -180,7 +197,7 @@ const FichaMedica = () => {
             <AntecedenteMedicoForm antecedenteMedico = {antecedenteMedico} handleSubmit={handleSubmitAntecedenteMedico} />
           )}
           { toggle === 3 && (
-            <Odontograma />
+            <OdontogramaChatgpt />
           )}
           </div>
         </div>

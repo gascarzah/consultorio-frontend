@@ -10,11 +10,12 @@ import es from "date-fns/locale/es";
 import { Alerta } from "../Alerta";
 import { useDispatch, useSelector } from "react-redux";
 
-import { getEmpleadosPorEmpresa, resetState } from "../../slices/empleadoSlice";
+import { getEmpleadosPorEmpresa,  } from "../../slices/empleadoSlice";
 
 import {
   modificarProgramacionDetalle,
   registrarProgramacionDetalle,
+  resetState
 } from "../../slices/programacionDetalleSlice";
 import { getProgramacionActivo } from "../../slices/programacionSlice";
 import { LISTAR_PROGRAMACION_DETALLE, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";

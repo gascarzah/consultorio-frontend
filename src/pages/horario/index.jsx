@@ -1,108 +1,56 @@
-import { useState } from "react";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Modal from "react-modal";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import {  useSelector } from "react-redux";
+import { Link} from "react-router-dom";
 import {
   eliminarHorario,
   getHorariosPaginado,
+  resetState,
 } from "../../slices/horarioSlice";
 
 import {Pagination, PreviewHorario} from "../../components";
-import { toast } from "react-toastify";
 
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    transform: "translate(-50%, -50%)",
-  },
-};
-Modal.setAppElement("#root");
+import { ITEMS_POR_PAGINA, SweetDelete } from "../../utils";
+import { usePagination } from "../../hook/usePagination";
+import { TableHeader } from "../../components/TableHeader";
+
+const headers = ['DESCRIPCION','ACCIONES']
+
 const ListarHorario = () => {
-  const { horarios, prev, next, total } = useSelector((state) => state.horario);
-  const [listHorarios, setListHorarios] = useState([]);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
-  const [disabledPrev, setDisabledPrev] = useState(false);
-  const [disabledNext, setDisabledNext] = useState(false);
-  // const [total, setTotal] = useState(0);
-  // const [modal, setModal] = useState(false);
-  const navigate = useNavigate();
-  useEffect(() => {
-    // buscarHoriosPaginados(currentPage, itemsPerPage);
-    dispatch(getHorariosPaginado({ page: currentPage, size: itemsPerPage }))
-  }, []);
+  
+  const { horarios, prev, next, total, resetState } = useSelector((state) => state.horario);
+  
+  const { handlePrev,
+    handleNext,
+    currentPage,
+    setCurrentPage,
+    listElementos,
+    setListElementos,
+    itemsPerPage,
+    disabledPrev,
+    setDisabledPrev,
+    disabledNext,
+    setDisabledNext } = usePagination(horarios, prev, next, getHorariosPaginado)
 
-  useEffect(() => {
-    if (horarios) {
-      setListHorarios(horarios);
-      setDisabledPrev(prev);
-      setDisabledNext(next);
-    }
-  }, [horarios, currentPage]);
-
-
-  const handlePrev = () => {
-    console.log("handlePrev ", handlePrev);
-    if (!disabledPrev) {
-      const pagina = currentPage - 1;
-      setCurrentPage(currentPage - 1);
-      console.log("pagPrev ", currentPage);
-      pagination(pagina);
-    }
-  };
-  const handleNext = () => {
-    console.log("disabledNext ", disabledNext);
-    if (!disabledNext) {
-      const pagina = currentPage + 1;
-      setCurrentPage(pagina);
-      console.log("pagNext ", currentPage);
-      pagination(pagina);
-    }
-  };
-
-  const pagination = (pagina) => {
-    dispatch(
-      getHorariosPaginado({
-        page: pagina,
-        size: itemsPerPage,
-      })
-    );
-  };
-
-  const dispatch = useDispatch();
+ 
 
   const handleDelete = (id) => {
-    // console.log("horarios id que llega", id);
+    SweetDelete(id, processDelete)
+  }
+
+  const processDelete = (id) => {
 
     dispatch(eliminarHorario(id))
       .unwrap()
       .then((resultado) => {
-        // buscarHoriosPaginados(pagina, itemsPerPage);
-        // console.log("resultado que llega eliminarHorario ", resultado);
-
-        // console.log("listHorarios ", listHorarios);
-        // console.log("id ", id);
-        // console.log("listHorarios ", listHorarios[0].idHorario);
-
-        const horariosActualizados = listHorarios.filter(
+        const horariosActualizados = listElementos.filter(
           (h) => h.idHorario !== parseInt(id)
         );
-
         console.log("horariosActualizados ", horariosActualizados);
-
-        setListHorarios(horariosActualizados);
-        setTotal(total - 1);
-        // navigate("/dashboard/listar-horario");
+        setListElementos(horariosActualizados);
+        dispatch(resetState())
       })
       .catch((errores) => {
-        console.log("Cita handleSubmit errores ===>> ", errores);
-
-        toast.error(errores.message);
+        console.log("processDelete handleSubmit errores ===>> ", errores);
       });
   };
 
@@ -117,31 +65,12 @@ const ListarHorario = () => {
         </Link>
 
         <table className="min-w-full divide-y divide-gray-200 mt-4">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Numero
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Descripcion
-              </th>
+          <TableHeader headers={headers}/>
 
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-right text-gray-500 uppercase "
-              ></th>
-            </tr>
-          </thead>
           <tbody className="divide-y divide-gray-200">
-            {console.log("listHorarios == > ", listHorarios)}
-            {listHorarios?.length ? (
-              listHorarios.map((horario) => (
+            {/* {console.log("listElementos == > ", listElementos)} */}
+            {listElementos?.length ? (
+              listElementos.map((horario) => (
                 <PreviewHorario
                   key={horario.idHorario}
                   horario={horario}
@@ -159,11 +88,11 @@ const ListarHorario = () => {
             )}
           </tbody>
         </table>
-        {console.log("total ", total)}
-        {console.log("listHorarios ", listHorarios)}
-        {total > 5 && (
+        {/* {console.log("total ", total)}
+        {console.log("listElementos ", listElementos)} */}
+        {total && total > ITEMS_POR_PAGINA && (
           <Pagination
-            totalPosts={listHorarios.length}
+            totalPosts={listElementos.length}
             itemsPerPage={itemsPerPage}
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}
@@ -177,16 +106,7 @@ const ListarHorario = () => {
         )}
       </div>
 
-      {/* {modal && (
-        <Modal
-          isOpen={modal}
-          style={customStyles}
-          onRequestClose={closeModal}
-          contentLabel="Detalle 24/09/2021"
-        >
-          <AgregarCliente />
-        </Modal>
-      )} */}
+
     </>
   );
 };

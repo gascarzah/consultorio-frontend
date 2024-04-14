@@ -4,15 +4,15 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 
 import DatePicker from "react-datepicker";
-import { toast, ToastContainer } from "react-toastify";
+
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
 import { Alerta } from "../../components";
 import { useDispatch, useSelector } from "react-redux";
-import { registrarProgramacion } from "../../slices/programacionSlice";
-import { getEmpleadosPorEmpresa, resetState } from "../../slices/empleadoSlice";
-import { LISTAR_PROGRAMACION, MENSAJE_GUARDADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
+import { registrarProgramacion, resetState } from "../../slices/programacionSlice";
+// import { getEmpleadosPorEmpresa } from "../../slices/empleadoSlice";
+import { LISTAR_PROGRAMACION, MENSAJE_GUARDADO_EXITOSO, SWEET_GUARDO, SweetCrud, TIEMPO_REDIRECCION } from "../../utils";
 
  const programacionSchema = Yup.object().shape({
   fechaInicial: Yup.date().required("Fecha Inicial requerida"),
@@ -28,16 +28,16 @@ export const ProgramacionForm = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log("user state >>>>>>> ", user);
+  // console.log("user state >>>>>>> ", user);
   useEffect(() => {
     getMondayOfCurrentWeek();
     // getSaturdayOfCurrentWeek();
     getSundayOfCurrentWeek();
   }, []);
 
-  useEffect(() => {
-    dispatch(getEmpleadosPorEmpresa(user?.idEmpresa));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getEmpleadosPorEmpresa(user?.idEmpresa));
+  // }, [dispatch]);
 
   const handleSubmit = (values, resetForm) => {
     dispatch(
@@ -51,19 +51,12 @@ export const ProgramacionForm = () => {
       .then((resultado) => {
         console.log("resultado ===>> ", resultado);
 
-        resetForm();
-
-
-        toast.success(MENSAJE_GUARDADO_EXITOSO);
-        dispatch(resetState());
-        setTimeout(() => {
-          navigate(LISTAR_PROGRAMACION);
-        }, TIEMPO_REDIRECCION);
-
+        SweetCrud(SWEET_GUARDO,MENSAJE_GUARDADO_EXITOSO)
+        navigate(LISTAR_PROGRAMACION);        
       })
       .catch((errores) => {
         console.log("errores ===>> ", errores);
-        toast.error(errores);
+        
       });
   };
 
@@ -73,7 +66,6 @@ export const ProgramacionForm = () => {
 
     const monday = new Date(today.setDate(first));
     setMonday(monday);
-    console.log("monday", monday);
   };
 
   // const getSaturdayOfCurrentWeek = () => {
@@ -99,7 +91,7 @@ export const ProgramacionForm = () => {
 
   return (
     <>
-      <ToastContainer />
+      
       {msg && <Alerta alerta={alerta} />}
       <Formik
         initialValues={{
@@ -171,7 +163,7 @@ export const ProgramacionForm = () => {
           );
         }}
       </Formik>
-      <ToastContainer/>
+      
     </>
   );
 };

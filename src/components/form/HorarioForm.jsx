@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-import {  ToastContainer, toast } from "react-toastify";
 import {
   modificarHorario,
   registrarHorario,
   resetState,
 } from "../../slices/horarioSlice";
 import { Alerta } from "../Alerta";
-import { TIEMPO_REDIRECCION, MENSAJE_GUARDADO_EXITOSO,MENSAJE_MODIFICADO_EXITOSO, LISTAR_HORARIO } from "../../utils";
+import {  MENSAJE_GUARDADO_EXITOSO,MENSAJE_MODIFICADO_EXITOSO, LISTAR_HORARIO, SweetCrud, SWEET_GUARDO, SWEET_MODIFICO } from "../../utils";
+
 
 const horarioSchema = Yup.object().shape({
   descripcion: Yup.string().required("La descripcion es obligatoria"),
@@ -26,35 +26,32 @@ export const HorarioForm = ({ horario }) => {
   const handleSubmit = (values, resetForm) => {
 
     if (!values.idHorario) {
+      
       dispatch(registrarHorario(values))
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
-          toast.success(MENSAJE_GUARDADO_EXITOSO);
-          dispatch(resetState());
-          setTimeout(() => {
-            navigate(LISTAR_HORARIO);
-          }, TIEMPO_REDIRECCION);
+          SweetCrud(SWEET_GUARDO,MENSAJE_GUARDADO_EXITOSO)
+          dispatch(resetState())
+          navigate(LISTAR_HORARIO);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
-          toast.error(errores.message);
+          
         });
     } else {
+      
       dispatch(modificarHorario(values))
         .unwrap()
         .then((resultado) => {
           console.log("resultado modificarCliente ===>> ", resultado);
-          toast.success(MENSAJE_MODIFICADO_EXITOSO);
-          dispatch(resetState());
-          setTimeout(() => {
-            navigate(LISTAR_HORARIO);
-          }, TIEMPO_REDIRECCION);
-          
+          SweetCrud(SWEET_MODIFICO,MENSAJE_MODIFICADO_EXITOSO)
+          dispatch(resetState())
+          navigate(LISTAR_HORARIO);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
-          toast.error(errores.message);
+          
         });
     }
   };
@@ -112,8 +109,7 @@ export const HorarioForm = ({ horario }) => {
           );
         }}
       </Formik>
-      <ToastContainer 
-    />
+      
     </>
   );
 };

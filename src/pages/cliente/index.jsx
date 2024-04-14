@@ -6,6 +6,7 @@ import Modal from "react-modal";
 import { getClientesPaginado } from "../../slices/clienteSlice";
 import {PreviewCliente, Pagination} from "../../components";
 import AgregarCliente from "./Agregar";
+import { ITEMS_POR_PAGINA } from "../../utils";
 
 
 const customStyles = {
@@ -153,7 +154,7 @@ const ListarCliente = () => {
             )}
           </tbody>
         </table>
-        {total > 5 && (
+        {total && total > ITEMS_POR_PAGINA && (
           <Pagination
             totalPosts={listClientes.length}
             itemsPerPage={itemsPerPage}

@@ -4,7 +4,7 @@ import clienteAxios from '../config/axios';
 
 const initialState = {
   loading: '',
-  code: null,
+  code: null, 
   message: null,
   logged: false,
   citas: [],
@@ -27,7 +27,7 @@ export const getListaCitados = createAsyncThunk(
       const { data } = await clienteAxios.get('/citas/listaCitados',
         {
           params: {
-            numeroDocumento: values.idEmpleado.numeroDocumento,
+            numeroDocumento: values.idEmpleado.numeroDocumento, 
             idEmpresa: values.idEmpleado.idEmpresa,
             numeroDiaSemana: values.numeroDiaSemana
           }
@@ -147,7 +147,7 @@ export const getHistorialCitas = createAsyncThunk(
 
 
 export const getCitasPaginado = createAsyncThunk(
-  'getHorariosPaginado',
+  'getCitasPaginado',
   async (values, { rejectWithValue }) => {
     try {
       const { data } = await clienteAxios.get(`/citas/pageable`,
