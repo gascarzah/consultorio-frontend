@@ -1,10 +1,12 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import clienteAxios from '../config/axios';
 
-
+const SUCCESS_CODE = 201;
+const SUCCESS_MESSAGE = 'Operación realizada correctamente';
+const ERROR_MESSAGE = 'Hubo un error en la operación';
 
 const initialState = {
-  loading: '',
+  loading: false,
   code: null,
   message: null,
   logged: false,
@@ -13,153 +15,117 @@ const initialState = {
   total: [],
   prev: null,
   next: null,
-  numberPage: 0
+  numberPage: 0,
 };
 
+// Función genérica para manejar casos fulfilled
+const handleFulfilled = (state, action, message) => {
+  console.log('Fulfilled payload:', action.payload);
+  state.loading = false;
+  state.code = SUCCESS_CODE;
+  state.message = message;
+  if (action.payload) {
+    state.programaciones = action.payload.content || state.programaciones;
+    state.programacion = action.payload || state.programacion;
+    state.total = action.payload.totalElements || state.total;
+    state.prev = action.payload.first || state.prev;
+    state.next = action.payload.last || state.next;
+    state.numberPage = action.payload.number || state.numberPage;
+  }
+};
+
+// Función genérica para manejar casos rejected
+const handleRejected = (state, action) => {
+  console.log('Rejected payload:', action.payload);
+  state.loading = false;
+  state.code = action.payload.status;
+  state.message = action.payload.message || ERROR_MESSAGE;
+};
+
+// Acciones asíncronas
 export const registrarProgramacion = createAsyncThunk(
   'programacion',
   async (values, { rejectWithValue }) => {
     try {
-      console.log('registrarProgramacion ', values)
+      console.log('Registrar programacion:', values);
       const { data } = await clienteAxios.post("/programaciones", values);
-      return data
+      return data;
     } catch (error) {
-      if (error.response && error.response.data.message) {
-
-        return rejectWithValue(error.response.data.message)
-      } else {
-
-        return rejectWithValue(error.message)
-      }
+      console.error('Error en registrar programacion:', error);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
-)
+);
 
 export const getProgramacionesPaginado = createAsyncThunk(
   'getProgramacionesPaginado',
   async (values, { rejectWithValue }) => {
     try {
-      const { data } = await clienteAxios.get(`/programaciones/${values.idEmpresa}/pageable`,
-        {
-          params: {
-
-            page: values.page,
-            size: values.size,
-          }
-        });
-      return data
+      console.log('Paginado de programaciones:', values);
+      const { data } = await clienteAxios.get(`/programaciones/${values.idEmpresa}/pageable`, {
+        params: { page: values.page, size: values.size },
+      });
+      return data;
     } catch (error) {
-
-      return rejectWithValue(error.response.data)
+      console.error('Error en getProgramacionesPaginado:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
-)
+);
 
 export const getProgramacionActivo = createAsyncThunk(
   'getProgramacionActivo',
-  async (estado, { rejectWithValue }) => {
-
+  async (_, { rejectWithValue }) => {
     try {
-
+      console.log('Obteniendo programación activa');
       const { data } = await clienteAxios.get(`/programaciones/activo`);
-
-      return data
+      return data;
     } catch (error) {
-
-      return rejectWithValue(error.response.data)
+      console.error('Error en getProgramacionActivo:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
-)
+);
 
 export const eliminarProgramacion = createAsyncThunk(
-  'eliminarHorario',
+  'eliminarProgramacion',
   async (id, { rejectWithValue }) => {
-  console.log(id)
+    console.log('Eliminando programación con id:', id);
     try {
       const { data } = await clienteAxios.delete(`/programaciones/${id}`);
-      return data
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data)
+      console.error('Error en eliminarProgramacion:', error);
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
-)
+);
 
+// Slice
 const programacionSlice = createSlice({
   name: 'programacion',
   initialState,
-  reducers: { resetState: () => initialState, },
-  extraReducers(builder) {
+  reducers: { resetState: () => initialState },
+  extraReducers: (builder) => {
     builder
-      // .addCase(revertAll, () => initialState)
       .addCase(registrarProgramacion.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getProgramacion payload', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'Se grabo'
+        handleFulfilled(state, { payload }, 'Se grabó correctamente');
       })
-      .addCase(registrarProgramacion.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-      })
+      .addCase(registrarProgramacion.rejected, handleRejected)
       .addCase(getProgramacionesPaginado.fulfilled, (state, { payload }) => {
-        console.log('se listo correctamente', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-        state.programaciones = payload.content
-        state.total = payload.totalElements
-        state.prev = payload.first
-        state.next = payload.last
-        state.numberPage = payload.number
+        handleFulfilled(state, { payload }, 'Se encontró la programación');
       })
-      .addCase(getProgramacionesPaginado.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-        state.programaciones = []
-      })
+      .addCase(getProgramacionesPaginado.rejected, handleRejected)
       .addCase(getProgramacionActivo.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getProgramacionActivo payload', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-        state.programacion = payload
+        handleFulfilled(state, { payload }, 'Se encontró la programación activa');
       })
-      .addCase(getProgramacionActivo.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+      .addCase(getProgramacionActivo.rejected, handleRejected)
+      .addCase(eliminarProgramacion.fulfilled, (state) => {
+        handleFulfilled(state, {}, 'Se eliminó correctamente');
       })
-      .addCase(eliminarProgramacion.fulfilled, (state, { payload }) => {
-        console.log('se elimino correctamente', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-      })
-      .addCase(eliminarProgramacion.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+      .addCase(eliminarProgramacion.rejected, handleRejected);
+  },
+});
 
-      })
-    // })
-  }
-
-
-})
-
-
-
-export const { resetState } = programacionSlice.actions
-
-export default programacionSlice.reducer
-
+export const { resetState } = programacionSlice.actions;
+export default programacionSlice.reducer;

@@ -11,8 +11,8 @@ const AgregarCita = () => {
         Registrar Cita
       </h1>
 
-      {/* <CitaForm /> */}
-      <MyCalendar/>
+      <CitaForm />
+      {/* <MyCalendar/> */}
     </>
   );
 };

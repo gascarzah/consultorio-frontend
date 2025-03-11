@@ -8,7 +8,7 @@ import DatePicker from "react-datepicker";
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
-import { Alerta } from "../../components";
+import { Alerta } from "..";
 import { useDispatch, useSelector } from "react-redux";
 import { registrarProgramacion, resetState } from "../../slices/programacionSlice";
 // import { getEmpleadosPorEmpresa } from "../../slices/empleadoSlice";

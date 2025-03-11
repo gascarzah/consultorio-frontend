@@ -1,74 +1,71 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit';
 import clienteAxios from '../config/axios';
 
-
+// Estado inicial
 const initialState = {
-  loading: '',
+  loading: false,  // `false` por defecto
   code: null,
   message: null,
-  logged: false,
-
+  citas: [],        // Agregar citas al estado
 };
 
-
-
-
-
+// Acción asincrónica para registrar consulta
 export const registrarConsulta = createAsyncThunk(
   'registrarConsulta',
   async (values, { rejectWithValue }) => {
-
-    console.log('values registrarConsulta  ==> ', values)
+    console.log('values registrarConsulta ==> ', values);
 
     try {
+      // Realizar la solicitud al servidor
+      const { data } = await clienteAxios.put('/citas', values);
+      console.log('data ==> ', data);
 
-      // const { data } = await clienteAxios.post(`/historiasClinicaDetalles`, values);
-      const { data } = await clienteAxios.put(`/citas`, values);
-      console.log('data ==> ', data)
-
-      return data
+      return data;
     } catch (error) {
-      console.error('error')
-      console.error(error.response.data.message)
-      return rejectWithValue(error.response.data)
+      console.error('error ==> ', error);
+
+      // Validar si la respuesta de error tiene los datos necesarios
+      if (error.response && error.response.data && error.response.data.message) {
+        console.error(error.response.data.message);
+        return rejectWithValue(error.response.data);
+      } else {
+        console.error('Error desconocido');
+        return rejectWithValue('Error desconocido');
+      }
     }
   }
-)
+);
 
-
-
+// Slice para manejar el estado
 const registrarConsultaSlice = createSlice({
   name: 'cita',
   initialState,
-  reducers: { resetState: () => initialState, },
-  // reducers: {},
-  extraReducers(builder) {
+  reducers: {
+    resetState: () => initialState,
+  },
+  extraReducers: (builder) => {
     builder
-      // .addCase(revertAll, () => initialState)
+      // Acción fulfilled: Se ejecuta si la consulta se registra con éxito
       .addCase(registrarConsulta.fulfilled, (state, { payload }) => {
-        console.log('se grabo correctamente', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-        state.citas = payload
+        console.log('Consulta registrada correctamente', payload);
+        state.loading = false;
+        state.code = payload.status || 201; // Asegúrate de obtener el código de la respuesta
+        state.message = 'Consulta registrada correctamente';
+        state.citas = payload;  // Asignar las citas o la respuesta completa
       })
+      // Acción rejected: Se ejecuta si ocurre un error
       .addCase(registrarConsulta.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-        state.citas = []
-      })
+        console.log('Error al registrar la consulta', payload);
+        state.loading = false;
+        state.code = payload?.status || 500; // Manejo de casos sin un `status`
+        state.message = payload?.message || 'Error al registrar la consulta';
+        state.citas = []; // Limpiar las citas en caso de error
+      });
+  },
+});
 
-  }
+// Exportar las acciones generadas por el slice
+export const { resetState } = registrarConsultaSlice.actions;
 
-
-})
-
-
-
-export const { resetState } = registrarConsultaSlice.actions
-
-export default registrarConsultaSlice.reducer
-
+// Exportar el reducer para ser usado en el store
+export default registrarConsultaSlice.reducer;

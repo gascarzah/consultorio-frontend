@@ -1,9 +1,8 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import clienteAxios from '../config/axios';
 
-
 const initialState = {
-  loading: '',
+  loading: false,  // `false` por defecto
   code: null,
   message: null,
   logged: false,
@@ -12,104 +11,90 @@ const initialState = {
   total: [],
   prev: null,
   next: null,
-  numberPage: 0
+  numberPage: 0,
 };
 
+// Acción asincrónica para obtener consultorios paginados
 export const getConsultoriosPaginado = createAsyncThunk(
   'getConsultoriosPaginado',
   async (values, { rejectWithValue }) => {
     try {
-      const { data } = await clienteAxios.get(`/consultorios/pageable`,
-        {
-          params: {
-            page: values.page,
-            size: values.size,
-          }
-        });
-      return data
+      const { data } = await clienteAxios.get('/consultorios/pageable', {
+        params: {
+          page: values.page,
+          size: values.size,
+        }
+      });
+      return data;
     } catch (error) {
-
-      return rejectWithValue(error.response.data)
+      console.error("Error en obtener consultorios paginados", error);
+      return rejectWithValue(error.response?.data || 'Error desconocido');
     }
   }
-)
+);
 
-
-
+// Acción asincrónica para registrar un consultorio
 export const registrarConsultorio = createAsyncThunk(
   'registrarConsultorio',
   async (values, { rejectWithValue }) => {
-
-    console.log('values registrarConsultorio  ==> ', values)
-
+    console.log('values registrarConsultorio ==> ', values);
     try {
-
-
-      const { data } = await clienteAxios.post(`/consultorios`, values);
-      console.log('data ==> ', data)
-
-      return data
+      const { data } = await clienteAxios.post('/consultorios', values);
+      console.log('data ==> ', data);
+      return data;
     } catch (error) {
-      console.error('error')
-      console.error(error.response.data.message)
-      return rejectWithValue(error.response.data)
+      console.error('Error al registrar el consultorio', error);
+      return rejectWithValue(error.response?.data || 'Error desconocido');
     }
   }
-)
+);
 
-
-
+// Slice para manejar el estado
 const consultorioSlice = createSlice({
   name: 'consultorio',
   initialState,
-  reducers: { resetState: () => initialState, },
-  // reducers: {},
+  reducers: { 
+    resetState: () => initialState,
+  },
   extraReducers(builder) {
     builder
-      // .addCase(revertAll, () => initialState)
+      // Acción fulfilled: Se ejecuta si la solicitud se completa correctamente
       .addCase(registrarConsultorio.fulfilled, (state, { payload }) => {
-        console.log('se grabo correctamente', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-
+        console.log('Consultorio registrado correctamente', payload);
+        state.loading = false;
+        state.code = 201;  // Código de éxito
+        state.message = 'Consultorio registrado con éxito';
       })
+      // Acción rejected: Se ejecuta si la solicitud falla
       .addCase(registrarConsultorio.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-        state.consultorios = []
+        console.log('Error al registrar consultorio', payload);
+        state.loading = false;
+        state.code = payload?.status || 500; // Default code to 500 if no status
+        state.message = payload?.message || 'Error al registrar el consultorio';
+        state.consultorios = []; // Limpiar los consultorios si hay un error
       })
+      // Acción fulfilled: Se ejecuta si los consultorios se cargan correctamente
       .addCase(getConsultoriosPaginado.fulfilled, (state, { payload }) => {
-        console.log('se listo correctamente', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-        state.consultorios = payload.content
-        state.total = payload.totalElements
-        state.prev = payload.first
-        state.next = payload.last
-        state.numberPage = payload.number
+        console.log('Consultorios listados correctamente', payload);
+        state.loading = false;
+        state.code = 200;  // Código de éxito
+        state.message = 'Consultorios cargados con éxito';
+        state.consultorios = payload.content;
+        state.total = payload.totalElements;
+        state.prev = payload.first;
+        state.next = payload.last;
+        state.numberPage = payload.number;
       })
+      // Acción rejected: Se ejecuta si la carga de consultorios falla
       .addCase(getConsultoriosPaginado.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-        state.consultorios = []
-      })
-
+        console.log('Error al listar consultorios', payload);
+        state.loading = false;
+        state.code = payload?.status || 500; // Default code to 500 if no status
+        state.message = payload?.message || 'Error al listar los consultorios';
+        state.consultorios = []; // Limpiar los consultorios si hay un error
+      });
   }
+});
 
-
-})
-
-
-
-export const { resetState } = consultorioSlice.actions
-
-export default consultorioSlice.reducer
-
+export const { resetState } = consultorioSlice.actions;
+export default consultorioSlice.reducer;

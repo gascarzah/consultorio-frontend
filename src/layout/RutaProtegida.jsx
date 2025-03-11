@@ -1,33 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
-
-
-
-import "react-toastify/dist/ReactToastify.css";
+import React from "react";
+import { useSelector } from "react-redux";
+import { Navigate, Outlet } from "react-router-dom";
 import { Header, Sidebar } from "../components";
+import "react-toastify/dist/ReactToastify.css";
 
-const RutaProtegida = ({ props }) => {
+const RutaProtegida = () => {
   const { logged } = useSelector((state) => state.auth);
 
+  if (!logged) return <Navigate to="/" />;
+
   return (
-    <>
-      {logged ? (
-        <div className="bg-gray-100">
-          <Header />
-
-          <div className="flex ">
-            <Sidebar />
-
-            <main className="flex flex-col items-center w-full ">
-              <Outlet />
-            </main>
-          </div>
-        </div>
-      ) : (
-        <Navigate to="/" />
-      )}
-    </>
+    <div className="bg-gray-100 min-h-screen">
+      <Header />
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-grow flex flex-col items-center p-4">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 };
 

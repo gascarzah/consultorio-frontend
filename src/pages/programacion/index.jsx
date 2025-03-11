@@ -21,6 +21,7 @@ const ListarProgramacionDetalle = () => {
   );
   const dispatch = useDispatch();
 
+  console.log("user ===> ",user)
 
   const { handlePrev,
     handleNext,
@@ -68,7 +69,7 @@ const ListarProgramacionDetalle = () => {
             listElementos.length > 0 ? "bg-sky-800" : "bg-sky-600"
           } text-white text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center`}
           to={"agregar-programacion"}
-          disabled="true"
+          disabled={true}
         >
           Generar Programacion
         </Link>

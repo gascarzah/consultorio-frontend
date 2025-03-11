@@ -2,23 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 export const PreviewProgramacion = ({ programacion, handleDelete }) => {
-  // console.log("programacion que llega", programacion);
   return (
-    <>
-      <tr>
-        <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
-          {programacion.idProgramacion}
-        </td>
-        <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
-          {programacion.strFechaInicial}
-        </td>
-        <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
-          {programacion.strFechaFinal}
-        </td>
-        <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {programacion.activo ? "ACTIVO" : "DESACTIVO"}
-        </td>
-        <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap flex gap-2"></td>
+    <tr>
+      <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
+        {programacion.idProgramacion}
+      </td>
+      <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
+        {programacion.strFechaInicial}
+      </td>
+      <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
+        {programacion.strFechaFinal}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
+        {programacion.activo ? "ACTIVO" : "DESACTIVO"}
+      </td>
+      <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap flex gap-2">
+        <td>
           <Link to={`editar-horario/${programacion.idProgramacion}`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +34,8 @@ export const PreviewProgramacion = ({ programacion, handleDelete }) => {
               />
             </svg>
           </Link>
-
+        </td>
+        <td>
           <button onClick={() => handleDelete(`${programacion.idProgramacion}`)} type="button">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -52,9 +52,8 @@ export const PreviewProgramacion = ({ programacion, handleDelete }) => {
               />
             </svg>
           </button>
-      </tr>
-    </>
+        </td>
+      </td>
+    </tr>
   );
 };
-
-

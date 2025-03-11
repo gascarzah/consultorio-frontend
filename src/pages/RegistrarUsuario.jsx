@@ -298,7 +298,9 @@ const RegistrarUsuario = () => {
                   <option value="" label="Selecciona una empresa">
                     Select una Empresa{" "}
                   </option>
-
+                  {/* <option key={1} value={1}>
+                        {'GAFAH'}
+                      </option> */}
                   {empresas?.map((empresa, index) => {
                     return (
                       <option key={empresa.idEmpresa} value={empresa.idEmpresa}>

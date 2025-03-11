@@ -12,7 +12,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { getCita, getHistorialCitas, editarCita } from "../../slices/citaSlice";
-
+import { ITEMS_POR_PAGINA } from "../../utils";
 
 const customStyles = {
   content: {
@@ -37,7 +37,7 @@ const nuevoClienteSchema = Yup.object().shape({
 });
 
 const AgregarConsulta = () => {
-  const { cita, historiales, prev, next } = useSelector((state) => state.cita);
+  const { cita, historiales, prev, next, total } = useSelector((state) => state.cita);
 
   const [play, setPlay] = useState(false);
   const { idCita, numeroDocumento } = useParams();

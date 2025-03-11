@@ -1,9 +1,8 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import clienteAxios from '../config/axios';
 
-
 const initialState = {
-  loading: '',
+  loading: false,
   user: {},
   code: null,
   message: null,
@@ -15,168 +14,76 @@ export const registrarUsuario = createAsyncThunk(
   'usuario',
   async (values, { rejectWithValue }) => {
     try {
-
       const { data } = await clienteAxios.post("/usuarios", values);
-
-      console.log(data);
-      return data
+      console.log('Registro exitoso:', data);
+      return data;
     } catch (error) {
-      if (error.response && error.response.data.message) {
-        // console.log('xxxxxxx')
-        // console.log(error.response.data.message)
-        // console.log(error.message)
-
-        return rejectWithValue(error.response.data.message)
-      } else {
-        // console.log('ttttttttt')
-        return rejectWithValue(error.message)
-      }
+      console.error('Error en registrarUsuario:', error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || { message: error.message });
     }
   }
-)
+);
 
 export const getUsuario = createAsyncThunk(
   'getUsuario',
   async (email, { rejectWithValue }) => {
-    console.log('values ==> ', email)
-
-
+    console.log('Buscando usuario con email:', email);
     try {
-
       const { data } = await clienteAxios.get(`/usuarios/${email}`);
-      console.log('data ==> ', data)
-
-      return data
+      console.log('Usuario encontrado:', data);
+      return data;
     } catch (error) {
-      console.error('error')
-      console.error(error.response.data.message)
-      return rejectWithValue(error.response.data)
+      console.error('Error en getUsuario:', error.response?.data || error.message);
+      return rejectWithValue(error.response?.data || { message: error.message });
     }
   }
-)
-
-
-
-
+);
 
 const usuarioSlice = createSlice({
   name: 'usuario',
   initialState,
-  reducers: { resetState: () => initialState, },
-
-  extraReducers(builder) {
+  reducers: {
+    resetState: () => initialState,
+  },
+  extraReducers: (builder) => {
     builder
-      // .addCase(revertAll, () => initialState)
-      .addCase(registrarUsuario.pending, (state, action) => {
-        state.loading = true
+      .addCase(registrarUsuario.pending, (state) => {
+        console.log('Registro de usuario pendiente...');
+        state.loading = true;
       })
       .addCase(registrarUsuario.fulfilled, (state, { payload }) => {
-        // console.log('fulfilled payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        console.log('Registro completado con éxito:', payload);
+        state.loading = false;
+        state.code = payload.status;
+        state.message = payload.message;
       })
       .addCase(registrarUsuario.rejected, (state, { payload }) => {
-        console.log('registrarUsuario.rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        console.error('Registro rechazado:', payload);
+        state.loading = false;
+        state.code = payload?.status || 500;
+        state.message = payload?.message || 'Error desconocido';
       })
       .addCase(getUsuario.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getUsuario payload', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-
+        console.log('Usuario obtenido con éxito:', payload);
+        state.loading = false;
+        state.code = 201;
+        state.message = 'Usuario encontrado';
         state.user = {
           id: payload.idUsuario,
           email: payload.email,
-          nombreCompleto: payload.empleado.apellidoPaterno + ' ' +
-            payload.empleado.apellidoMaterno + ', ' +
-            payload.empleado.nombres,
-          idEmpleado: payload.empleado.idEmpleado,
-          idEmpresa: payload.empleado.empresa.idEmpresa
-        }
+          nombreCompleto: `${payload.empleado.apellidoPaterno} ${payload.empleado.apellidoMaterno}, ${payload.empleado.nombres}`,
+          numeroDocumento: payload.numeroDocumento,
+          idEmpresa: payload.empleado?.empresa?.idEmpresa,
+        };
       })
       .addCase(getUsuario.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-      })
-    // .addCase(getUsuarios.fulfilled,(state, {payload}) => {
-    //   console.log('fulfilled getUsuario payload', payload)
+        console.error('Error al obtener usuario:', payload);
+        state.loading = false;
+        state.code = payload?.status || 500;
+        state.message = payload?.message || 'Error desconocido';
+      });
+  },
+});
 
-    //   state.loading = false
-    //   state.code = 201
-    //   state.message = 'se encontro'
-    //   state.usuarios = payload
-    // })
-    // .addCase(getUsuarios.rejected,(state, {payload}) => {
-    //   console.log('rejected payload', payload)
-    //    state.loading = false
-    //   state.code = payload.status
-    //   state.message = payload.message
-    // })
-  }
-
-
-})
-
-//2
-// const usuarioSlice = createSlice({
-//     name: 'usuario',
-//     initialState,
-//     reducers: {
-//       resetState:  () => initialState
-//     },
-//     extraReducers: {
-//       [registrarUsuario.pending](state) {
-//         // console.log('pendiente')
-//         state.loading = 'pendiente'
-//       },
-//       [registrarUsuario.fulfilled](state, {payload}) {
-
-//         console.log('fulfilled payload', payload)
-//         state.loading = 'grabo'
-//         state.code = payload.status
-//         state.message = payload.message
-
-//       },
-//       [registrarUsuario.rejected](state, {payload}) {
-//         console.log('rejected payload', payload)
-//         state.loading = 'rechazado'
-//         state.code = payload.status
-//         state.message = payload.message
-
-//       },
-//     },
-
-// }) 
-
-//1
-// const usuarioSlice = createSlice({
-//     name: 'usuario',
-//     initialState,
-//     reducers: {
-//         setUser: (state, action)=>{
-//             state.user = action.payload
-//             state.message = "Se registro con exito"
-//             state.error = false
-//         },
-//         setError: (state, action)=>{
-//           console.log('action')
-//           console.log(action.payload)
-//             state.message = action.payload
-//             state.error = true
-//         }
-
-//     }
-
-// }) 
-
-export const { resetState } = usuarioSlice.actions
-
-export default usuarioSlice.reducer
-
+export const { resetState } = usuarioSlice.actions;
+export default usuarioSlice.reducer;

@@ -61,7 +61,7 @@ const authSlice = createSlice({
         state.rol = decoded.roles[0]
       })
       .addCase(login.rejected, (state, { payload }) => {
-
+        console.log('login.rejected ', state, payload)
         state.loading = false
         state.code = payload.status
         state.message = payload.message

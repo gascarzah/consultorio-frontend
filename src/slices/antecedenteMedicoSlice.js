@@ -1,206 +1,172 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import clienteAxios from '../config/axios';
 
-
+// Estado inicial
 const initialState = {
-  loading: '',
+  loading: false,
   antecedenteMedico: {},
   code: null,
   message: null,
   antecedentesMedicos: [],
-  total: [],
+  total: 0,
   prev: null,
   next: null,
   numberPage: 0
 };
 
+// Función para manejar los errores y evitar repetición
+const handleRejected = (state, payload) => {
+  state.loading = false;
+  state.code = payload?.status || null;
+  state.message = payload?.message || 'Error';
+};
+
+// Crear los thunks
 export const registrarAntecedenteMedico = createAsyncThunk(
-  'antecedenteMedico',
+  'antecedenteMedico/registrar',
   async (values, { rejectWithValue }) => {
-
-    console.log('registrarAntecedenteMedico ', values)
-
     try {
-      const { data } = await clienteAxios.post("/antecedentesMedicos", values);
-      return data
+      const { data } = await clienteAxios.post('/antecedentesMedicos', values);
+      return data;
     } catch (error) {
-      if (error.response && error.response.data.message) {
-
-
-        return rejectWithValue(error.response.data.message)
-      } else {
-        return rejectWithValue(error.message)
-      }
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
-)
+);
+
 export const modificarAntecedenteMedico = createAsyncThunk(
-  'modificarAntecedenteMedico',
+  'antecedenteMedico/modificar',
   async (values, { rejectWithValue }) => {
-
-    console.log('modificarAntecedenteMedico ', values)
-
     try {
-      const { data } = await clienteAxios.put("/antecedentesMedicos", values);
-      return data
+      const { data } = await clienteAxios.put('/antecedentesMedicos', values);
+      return data;
     } catch (error) {
-      if (error.response && error.response.data.message) {
-
-
-        return rejectWithValue(error.response.data.message)
-      } else {
-        return rejectWithValue(error.message)
-      }
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
-)
+);
 
 export const getAntecedenteMedico = createAsyncThunk(
-  'getAntecedenteMedico',
+  'antecedenteMedico/get',
   async (id, { rejectWithValue }) => {
-
     try {
-
       const { data } = await clienteAxios.get(`/antecedentesMedicos/${id}`);
-      console.log(data)
-      return data
+      return data;
     } catch (error) {
-
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
-)
+);
 
 export const getAntecedentesMedicos = createAsyncThunk(
-  'getAntecedentesMedicos',
-  async (email, { rejectWithValue }) => {
-
+  'antecedenteMedico/getAll',
+  async (_, { rejectWithValue }) => {
     try {
-
-      const { data } = await clienteAxios.get(`/antecedentesMedicos`);
-
-
-      return data
+      const { data } = await clienteAxios.get('/antecedentesMedicos');
+      return data;
     } catch (error) {
-
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
-)
+);
 
 export const getAntecedentesMedicosPaginado = createAsyncThunk(
-  'getAntecedentesMedicosPaginado',
+  'antecedenteMedico/getPaginado',
   async (values, { rejectWithValue }) => {
-
     try {
-      console.log('aca')
-      const { data } = await clienteAxios.get(`/antecedentesMedicos/pageable`,
-        {
-          params: {
-            page: values.page,
-            size: values.size,
-          }
-        });
-        console.log(data)
-      return data
+      const { data } = await clienteAxios.get('/antecedentesMedicos/pageable', {
+        params: {
+          page: values.page,
+          size: values.size,
+        }
+      });
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
-)
+);
 
+// Crear el slice
 const antecedenteMedicoSlice = createSlice({
   name: 'antecedenteMedico',
   initialState,
-  reducers: { resetState: () => initialState, },
-  // reducers: {},
+  reducers: {
+    resetState: () => initialState,
+  },
   extraReducers(builder) {
     builder
-      // .addCase(revertAll, () => initialState)
-      .addCase(registrarAntecedenteMedico.pending, (state, action) => {
-        state.loading = true
+      // Registrar antecedente médico
+      .addCase(registrarAntecedenteMedico.pending, (state) => {
+        state.loading = true;
       })
       .addCase(registrarAntecedenteMedico.fulfilled, (state, { payload }) => {
-        console.log('fulfilled payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        state.loading = false;
+        state.code = payload.status;
+        state.message = payload.message;
       })
       .addCase(registrarAntecedenteMedico.rejected, (state, { payload }) => {
-        console.log('registrarAntecedenteMedico.rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        handleRejected(state, payload);
       })
-      .addCase(modificarAntecedenteMedico.pending, (state, action) => {
-        state.loading = true
+
+      // Modificar antecedente médico
+      .addCase(modificarAntecedenteMedico.pending, (state) => {
+        state.loading = true;
       })
       .addCase(modificarAntecedenteMedico.fulfilled, (state, { payload }) => {
-        console.log('fulfilled modificarAntecedenteMedico', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        state.loading = false;
+        state.code = payload.status;
+        state.message = payload.message;
       })
       .addCase(modificarAntecedenteMedico.rejected, (state, { payload }) => {
-        console.log('modificarAntecedenteMedico.rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        handleRejected(state, payload);
       })
+
+      // Obtener antecedente médico por ID
       .addCase(getAntecedenteMedico.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getAntecedenteMedico payload', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
+        state.loading = false;
+        state.code = 201;
+        state.message = 'Se encontró el antecedente médico';
         state.antecedenteMedico = {
           id: payload.numeroAntecedenteMedico,
           email: payload.email,
-          nombreCompleto: payload.apellidoPaterno + ' ' +
-            payload.apellidoMaterno + ', ' +
-            payload.nombres
-        }
+          nombreCompleto: `${payload.apellidoPaterno} ${payload.apellidoMaterno}, ${payload.nombres}`,
+        };
       })
       .addCase(getAntecedenteMedico.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        handleRejected(state, payload);
       })
+
+      // Obtener todos los antecedentes médicos
       .addCase(getAntecedentesMedicos.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getAntecedenteMedico payload', payload)
-        // state.loading = 'grabo'
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-        state.antecedentemedicos = payload
+        state.loading = false;
+        state.code = 201;
+        state.message = 'Se encontraron antecedentes médicos';
+        state.antecedentesMedicos = payload;
       })
       .addCase(getAntecedentesMedicos.rejected, (state, { payload }) => {
-        console.log('rejected payload', payload)
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
+        handleRejected(state, payload);
       })
+
+      // Obtener antecedentes médicos paginados
       .addCase(getAntecedentesMedicosPaginado.fulfilled, (state, { payload }) => {
-        console.log('fulfilled getAntecedentesMedicosPaginado payload', payload)
-        state.loading = false
-        state.code = 201
-        state.message = 'se encontro'
-        state.antecedentesMedicos = payload.content
-        state.total = payload.totalElements
-        state.prev = payload.first
-        state.next = payload.last
-        state.numberPage = payload.number
+        state.loading = false;
+        state.code = 201;
+        state.message = 'Se encontraron antecedentes médicos';
+        state.antecedentesMedicos = payload.content;
+        state.total = payload.totalElements;
+        state.prev = payload.first;
+        state.next = payload.last;
+        state.numberPage = payload.number;
       })
       .addCase(getAntecedentesMedicosPaginado.rejected, (state, { payload }) => {
-        state.loading = false
-        state.code = payload.status
-        state.message = payload.message
-      })
+        handleRejected(state, payload);
+      });
   }
-})
+});
 
+// Exportar las acciones
+export const { resetState } = antecedenteMedicoSlice.actions;
 
-export const { resetState } = antecedenteMedicoSlice.actions
-
-export default antecedenteMedicoSlice.reducer
+// Exportar el reducer
+export default antecedenteMedicoSlice.reducer;

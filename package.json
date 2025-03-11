@@ -15,6 +15,7 @@
     "axios": "^0.27.2",
     "dayjs": "^1.11.7",
     "formik": "^2.2.9",
+    "frontendjs": "file:",
     "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
     "react-big-calendar": "^1.11.2",

@@ -213,16 +213,18 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                     Selecciona un Medico{" "}
                   </option>
 
+                  {console.log("empleados ",empleados)}
                   {empleados.length > 0 &&
                     empleados?.map((empleado, index) => {
+                      
                       return (
                         <option
                           key={empleado.numeroDocumento}
                           value={empleado.numeroDocumento}
                         >
-                          {empleado.persona.apellidoPaterno}{" "}
-                          {empleado.persona.apellidoMaterno},{" "}
-                          {empleado.persona.nombres}
+                          {empleado.apellidoPaterno}{" "}
+                          {empleado.apellidoMaterno},{" "}
+                          {empleado.nombres}
                         </option>
                       );
                     })}
