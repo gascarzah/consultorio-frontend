@@ -11,7 +11,8 @@ const initialState = {
   total: [],
   prev: null,
   next: null,
-  numberPage: 0
+  numberPage: 0,
+  empleado: null
 };
 
 // Acción para registrar empleado
@@ -64,6 +65,37 @@ export const getEmpleadosPaginado = createAsyncThunk(
   }
 );
 
+// Acción para modificar empleado
+export const modificarEmpleado = createAsyncThunk(
+  'empleado/modificar',
+  async (values, { rejectWithValue }) => {
+    try {
+      console.log('modificarEmpleado values ==> ', values);
+      const { data } = await clienteAxios.put("/empleados", values);
+      return data;
+    } catch (error) {
+      console.error('Error al modificar empleado:', error);
+      return rejectWithValue(error?.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Acción para obtener un empleado por ID
+export const getEmpleado = createAsyncThunk(
+  'empleado/get',
+  async (id, { rejectWithValue }) => {
+    try {
+      console.log('Obteniendo empleado por ID:', id);
+      const { data } = await clienteAxios.get(`/empleados/${id}`);
+      console.log('Respuesta getEmpleado:', data);
+      return data;
+    } catch (error) {
+      console.error('Error al obtener empleado:', error);
+      return rejectWithValue(error?.response?.data || 'Error desconocido');
+    }
+  }
+);
+
 const empleadoSlice = createSlice({
   name: 'empleado',
   initialState,
@@ -101,6 +133,35 @@ const empleadoSlice = createSlice({
         state.loading = false;
         state.code = payload?.status || 500; // Valor predeterminado de error
         state.message = payload?.message || 'Error al cargar empleados';
+      })
+      .addCase(modificarEmpleado.fulfilled, (state) => {
+        state.loading = false;
+        state.code = 200;
+        state.message = 'Empleado modificado correctamente';
+      })
+      .addCase(modificarEmpleado.rejected, (state, { payload }) => {
+        state.loading = false;
+        state.code = payload?.status || 500;
+        state.message = payload?.message || 'Error al modificar empleado';
+      })
+      .addCase(getEmpleado.pending, (state) => {
+        state.loading = true;
+        state.empleado = null;
+        state.error = null;
+      })
+      .addCase(getEmpleado.fulfilled, (state, { payload }) => {
+        console.log('Empleado obtenido:', payload);
+        state.loading = false;
+        state.code = 200;
+        state.message = 'Empleado obtenido con éxito';
+        state.empleado = payload;
+      })
+      .addCase(getEmpleado.rejected, (state, { payload }) => {
+        console.log('Error al obtener empleado:', payload);
+        state.loading = false;
+        state.code = payload?.status || 500;
+        state.message = payload?.message || 'Error al obtener empleado';
+        state.empleado = null;
       });
   }
 });

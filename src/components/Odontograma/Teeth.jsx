@@ -1,44 +1,50 @@
 import React from 'react';
-import Tooth from './Tooth';
 
-function Teeth({ start, end, x, y, handleChange }) {
-    let tooths = getArray(start, end);
+export const Teeth = ({ start, end, x, y, handleChange, getColor, isSelected }) => {
+  const teeth = [];
+  const step = start < end ? 1 : -1;
 
-    return (
-        <g transform="scale(2.1)" id="gmain">
-            {
-                tooths.map((i) =>
-                    <Tooth onChange={handleChange}
-                        key={i}
-                        number={i}
-                        positionY={y + 50}
-                        positionX={Math.abs((i - start) * 25) + x + 30}
-                    />
-                )
-            }
-        </g>
-    )
-}
+  for (let i = start; i !== end + step; i += step) {
+    teeth.push(i);
+  }
 
-function getArray(start, end) {
-    if (start > end) return getInverseArray(start, end);
+  const teethCount = teeth.length;
+  const toothWidth = 40;
+  const toothSpacing = 45;
+  const totalWidth = teethCount * toothSpacing;
+  const svgWidth = totalWidth + 20; // Add padding
 
-    let list = [];
-    for (var i = start; i <= end; i++) {
-        list.push(i);
-    }
-
-    return list;
-}
-
-function getInverseArray(start, end) {
-    let list = [];
-
-    for (var i = start; i >= end; i--) {
-        list.push(i);
-    }
-
-    return list;
-}
-
-export default Teeth;
+  return (
+    <svg width={svgWidth} height="100">
+      <g transform={`translate(${x},${y})`}>
+        {teeth.map((tooth, index) => {
+          const xPos = index * toothSpacing;
+          return (
+            <g key={tooth} transform={`translate(${xPos},0)`}>
+              <rect
+                x="2"
+                y="2"
+                width={toothWidth}
+                height={toothWidth}
+                fill={getColor(tooth)}
+                stroke="#000"
+                strokeWidth="1"
+                onClick={() => handleChange(tooth)}
+                className={isSelected === tooth ? 'selected' : ''}
+              />
+              <text
+                x={toothWidth/2 + 2}
+                y="55"
+                textAnchor="middle"
+                fontSize="14"
+                fill="#666"
+              >
+                {tooth}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    </svg>
+  );
+}; 

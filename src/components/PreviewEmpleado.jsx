@@ -7,19 +7,19 @@ export  const PreviewEmpleado = ({ empleado }) => {
     <>
       <tr>
         <td className="px-6 py-4 text-sm font-medium text-gray-800 whitespace-nowrap">
-          {empleado.persona.apellidoPaterno}
+          {empleado.apellidoPaterno}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {empleado.persona.apellidoPaterno}
+          {empleado.apellidoPaterno}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {empleado.persona.nombres}
+          {empleado.nombres}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {empleado.persona.email}
+          {empleado.email}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {empleado.persona.direccion}
+          {empleado.direccion}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap flex gap-2">
           <Link to={`editar-empleado/${empleado.idEmpleado}`}>

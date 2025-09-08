@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
 import Switch from "react-switch";
-import { toast, ToastContainer } from "react-toastify";
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
@@ -19,11 +18,14 @@ import {
 } from "../../slices/programacionDetalleSlice";
 import { getProgramacionActivo } from "../../slices/programacionSlice";
 import { LISTAR_PROGRAMACION_DETALLE, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
+import { SWEET_GUARDO, SWEET_MODIFICO, SWEET_SUCESS, SweetCrud } from "../../utils";
+
+import { toast } from "react-toastify";
 
 registerLocale("es", es);
 
 const programacionDetalleSchema = Yup.object().shape({
-  numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
+  idEmpleado: Yup.string().required("Debe seleccionar un medico"),
 });
 
 export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
@@ -114,7 +116,7 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
           console.log("redirecciona login");
 
           resetForm();
-          toast.success(MENSAJE_GUARDADO_EXITOSO);
+          SweetCrud(SWEET_GUARDO, SWEET_SUCESS);
           dispatch(resetState());
           setTimeout(() => {
             navigate(LISTAR_PROGRAMACION_DETALLE);
@@ -122,7 +124,7 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
-          toast.error(errores);
+          SweetCrud('Error', errores.message || 'No se pudo guardar');
         });
     } else {
       dispatch(
@@ -133,7 +135,7 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
           console.log("resultado ===>> ", resultado);
           console.log("redirecciona login");
           resetForm();
-          toast.success(MENSAJE_MODIFICADO_EXITOSO);
+          SweetCrud(SWEET_MODIFICO, SWEET_SUCESS);
           dispatch(resetState());
           setTimeout(() => {
             navigate(LISTAR_PROGRAMACION_DETALLE);
@@ -141,7 +143,7 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
-          toast.error(errores);
+          SweetCrud('Error', errores.message || 'No se pudo modificar');
         });
     }
   };
@@ -150,13 +152,16 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
 
   return (
     <>
-      <ToastContainer />
+      <h1 className="text-sky-600 font-black text-3xl capitalize text-center mb-8">
+        {programacionDetalle?.idProgramacionDetalle ? "Editar Programación Detalle" : "Registrar Programación Detalle"}
+      </h1>
       {msg && <Alerta alerta={alerta} />}
 
       <Formik
         initialValues={{
-          numeroDocumento:
-            programacionDetalle?.empleado?.idEmpleado.numeroDocumento ?? "",
+          // numeroDocumento:
+          //   programacionDetalle?.empleado?.idEmpleado.numeroDocumento ?? "",
+          idEmpleado: programacionDetalle?.empleado?.idEmpleado ?? "",
           checked: [],
           idProgramacion: programacion?.idProgramacion,
           idProgramacionDetalle: programacion?.idProgramacion,
@@ -171,7 +176,8 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
         {({ errors, touched, values, handleChange, setFieldValue }) => {
           return (
             <Form className="my-10 bg-white shadow rounded p-10 w-2/5  ">
-              {/* {console.log("props ", props)} */}
+              {console.log("errors ", errors)}
+              {console.log("values ", values)}
               <div className="flex flex-row gap-10">
                 <div className="my-3 flex flex-col justify-evenly ">
                   <label
@@ -198,12 +204,12 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                   Medico
                 </label>
                 <select
-                  name="numeroDocumento"
-                  value={values.numeroDocumento}
+                  name="idEmpleado"
+                  value={values.idEmpleado}
                   onChange={async (e) => {
                     const { value } = e.target;
                     console.log(value);
-                    setFieldValue("numeroDocumento", value);
+                    setFieldValue("idEmpleado", value);
                     // handleVerificarProgramacion(value);
                   }}
                   className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
@@ -219,8 +225,8 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                       
                       return (
                         <option
-                          key={empleado.numeroDocumento}
-                          value={empleado.numeroDocumento}
+                          key={empleado.idEmpleado}
+                          value={empleado.idEmpleado}
                         >
                           {empleado.apellidoPaterno}{" "}
                           {empleado.apellidoMaterno},{" "}
@@ -229,8 +235,8 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
                       );
                     })}
                 </select>
-                {errors.numeroDocumento && touched.numeroDocumento ? (
-                  <Alerta msg={errors.numeroDocumento} error={true} />
+                {errors.idEmpleado && touched.idEmpleado ? (
+                  <Alerta msg={errors.idEmpleado} error={true} />
                 ) : null}
               </div>
 
@@ -330,7 +336,6 @@ export const ProgramacionDetalleForm = ({ programacionDetalle }) => {
           );
         }}
       </Formik>
-      <ToastContainer/>
     </>
   );
 };

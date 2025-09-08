@@ -1,7 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { useDispatch } from "react-redux";
-import { create } from "yup/lib/array";
-import clienteAxios from "../config/axios";
+import { createAsyncThunk, createSlice, isRejectedWithValue } from '@reduxjs/toolkit'
+import clienteAxios from '../config/axios';
 
 const initialState = {
     loading: false,
@@ -11,26 +9,191 @@ const initialState = {
     roles: [],
   };
 
-const rolSlice = createSlice({
-    name: 'rol',
-    initialState,
-    reducers: {
-        setRoles: (state, action) => {
-            state.roles = action.payload
+  export const getRolesPaginado = createAsyncThunk(
+    'getRolesPaginado',
+    async (values, { rejectWithValue }) => {
+        try {
+            const { data } = await clienteAxios.get(`/roles/pageable`,
+                {
+                    params: {
+                        page: values.page,
+                        size: values.size,
+                    }
+                });
+            return data
+        } catch (error) {
+
+            return rejectWithValue(error.response.data)
         }
     }
+)
+
+
+
+
+export const registrarRol = createAsyncThunk(
+    'registrarRol',
+    async (values, { rejectWithValue }) => {
+
+        console.log('values registrarRol  ==> ', values)
+
+        try {
+
+
+            const { data } = await clienteAxios.post(`/roles`, values);
+            console.log('data ==> ', data)
+
+            return data
+        } catch (error) {
+            console.error('error')
+            console.error(error.response.data.message)
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
+export const modificarRol = createAsyncThunk(
+    'modificarRol',
+    async (values, { rejectWithValue }) => {
+
+        console.log('values modificarRol  ==> ', values)
+
+        try {
+
+
+            const { data } = await clienteAxios.put(`/roles`, values);
+            console.log('data ==> ', data)
+
+            return data
+        } catch (error) {
+            console.error('error')
+            console.error(error.response.data.message)
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
+
+export const getRol = createAsyncThunk(
+    'getRol',
+    async (id, { rejectWithValue }) => {
+        console.log('llega getHorario ', id)
+        try {
+
+            const { data } = await clienteAxios.get(`/roles/${id}`);
+
+            return data
+        } catch (error) {
+
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
+
+export const getRoles = createAsyncThunk(
+    'getRoles',
+    async (values, { rejectWithValue }) => {
+        try {
+            const { data } = await clienteAxios.get(`/roles`);
+            return data
+        } catch (error) {
+
+            return rejectWithValue(error.response.data)
+        }
+    }
+)
+
+const roleslice = createSlice({
+    name: 'rol',
+    initialState,
+    reducers: { resetState: () => initialState, },
+    // reducers: {},
+    extraReducers(builder) {
+        builder
+            // .addCase(revertAll, () => initialState)
+            .addCase(registrarRol.fulfilled, (state, { payload }) => {
+                console.log('se grabo correctamente', payload)
+                // state.loading = 'grabo'
+                state.loading = false
+                state.code = 201
+                state.message = 'se encontro'
+
+            })
+            .addCase(registrarRol.rejected, (state, { payload }) => {
+                console.log('rejected payload', payload)
+                state.loading = false
+                state.code = payload.status
+                state.message = payload.message
+                state.roles = []
+            })
+            .addCase(getRolesPaginado.fulfilled, (state, { payload }) => {
+                console.log('se listo correctamente', payload)
+                // state.loading = 'grabo'
+                state.loading = false
+                state.code = 201
+                state.message = 'se encontro'
+                state.roles = payload.content
+                state.total = payload.totalElements
+                state.prev = payload.first
+                state.next = payload.last
+                state.numberPage = payload.number
+            })
+            .addCase(getRolesPaginado.rejected, (state, { payload }) => {
+                console.log('rejected payload', payload)
+                state.loading = false
+                state.code = payload.status
+                state.message = payload.message
+                state.roles = []
+            })
+            .addCase(getRol.fulfilled, (state, { payload }) => {
+                console.log('fulfilled getRol payload', payload)
+                // state.loading = 'grabo'
+                state.loading = false
+                state.code = 201
+                state.message = 'se encontro'
+                state.rol = payload
+            })
+            .addCase(getRol.rejected, (state, { payload }) => {
+                console.log('rejected getRol payload', payload)
+                state.loading = false
+                state.code = payload.status
+                state.message = payload.message
+            })
+            .addCase(getRoles.fulfilled, (state, { payload }) => {
+                console.log('fulfilled getRol payload', payload)
+                // state.loading = 'grabo'
+                state.loading = false
+                state.code = 201
+                state.message = 'se encontro'
+                state.roles = payload
+            })
+            .addCase(getRoles.rejected, (state, { payload }) => {
+                console.log('rejected getRol payload', payload)
+                state.loading = false
+                state.code = payload.status
+                state.message = payload.message
+            })
+            .addCase(modificarRol.fulfilled, (state, { payload }) => {
+                console.log('se grabo correctamente', payload)
+                // state.loading = 'grabo'
+                state.loading = false
+                state.code = 201
+                state.message = 'se encontro'
+
+            })
+            .addCase(modificarRol.rejected, (state, { payload }) => {
+                console.log('rejected payload', payload)
+                state.loading = false
+                state.code = payload.status
+                state.message = payload.message
+                state.roles = []
+            })
+    }
+
+
 })
 
 
-export const {setRoles} = rolSlice.actions
 
-export default rolSlice.reducer
+export const { resetState } = roleslice.actions
 
-export const getRoles = () => async (dispatch) => {
-    try {
-        const { data } = await clienteAxios.get('/roles')
-        dispatch(setRoles(data))
-    } catch (error) {
-        console.log(error);
-    }
-}
+export default roleslice.reducer
+

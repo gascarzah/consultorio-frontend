@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
-import { Alerta, PreviewConsulta } from "../../components";
+import { PreviewConsulta } from "../../components";
 import { useDispatch, useSelector } from "react-redux";
 import { getListaCitados, resetState } from "../../slices/citaSlice";
+import { getUsuario } from "../../slices/usuarioSlice";
 
 
 const nuevoClienteSchema = Yup.object().shape({
@@ -44,14 +45,37 @@ const ListarConsulta = () => {
   );
 
   const { user } = useSelector((state) => state.usuario);
+  const { email } = useSelector((state) => state.auth);
 
   const dispatch = useDispatch();
+  console.log('Estado de autenticación - email:', email);
+  console.log('Estado de usuario:', user);
 
   useEffect(() => {
     dispatch(resetState());
-
-    handleCitas({ idEmpleado: user.idEmpleado, numeroDiaSemana: getToday() });
-  }, []);
+    
+    if (email) {
+      console.log('Obteniendo datos del usuario con email:', email);
+      dispatch(getUsuario(email))
+        .unwrap()
+        .then((resultado) => {
+          console.log('Datos del usuario obtenidos:', resultado);
+          if (resultado?.empleado?.idEmpleado && resultado?.empleado?.empresa?.idEmpresa) {
+            handleCitas({ 
+              idEmpleado: resultado.empleado.idEmpleado, 
+              idEmpresa: resultado.empleado.empresa.idEmpresa,
+              numeroDiaSemana: getToday() 
+            });
+          }
+        })
+        .catch((error) => {
+          console.error('Error al obtener usuario:', error);
+          toast.error('Error al obtener datos del usuario');
+        });
+    } else {
+      console.log('No hay email en el estado de autenticación');
+    }
+  }, [email]);
 
   const getToday = () => {
     const date = new Date();
@@ -73,17 +97,17 @@ const ListarConsulta = () => {
   };
 
   const handleCitas = (valores) => {
-    console.log("idProgramacionDetalle a enviar ", valores);
+    console.log("Valores a enviar en getListaCitados:", valores);
 
     dispatch(getListaCitados(valores))
       .unwrap()
       .then((resultado) => {
-        console.log("resultadohandleCitas  ===>> ", resultado);
+        console.log("Resultado de getListaCitados:", resultado);
         setListaCitas(resultado);
       })
       .catch((errores) => {
-        console.log("errores handleCitas ===>> ", errores);
-        toast.error(errores);
+        console.log("Error en getListaCitados:", errores);
+        toast.error(errores?.message || 'Error al obtener las citas');
         setListaCitas([]);
       });
   };
@@ -92,83 +116,66 @@ const ListarConsulta = () => {
 
   return (
     <>
-      <h1 className="text-sky-600 font-black text-3xl capitalize text-center">
-        Consultas del Dia
-      </h1>
-
-      {msg && <Alerta alerta={alerta} />}
-
-      <Formik
-        initialValues={{
-          idEmpleado: user.idEmpleado,
-          idProgramacionDetalle: diaAtencion,
-        }}
-        enableReinitialize={true}
-        onSubmit={(values, { resetForm }) => {
-          handleSubmit(values, resetForm);
-          //resetForm();
-        }}
-        validationSchema={nuevoClienteSchema}
-      >
-        {(props) => {
-          return (
-            <Form className="my-10 bg-white shadow rounded p-10 flex flex-col w-2/5 ">
-              <div className="my-3">
-                <label
-                  htmlFor="idProgramacionDetalle"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  {weekday[getToday()]} {format(new Date())}
-                </label>
+      <div className="container mx-auto px-4 py-8">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-2xl font-bold text-gray-800">
+                Consultas del Día
+              </h1>
+              <div className="text-sm text-gray-600 font-medium">
+                {weekday[getToday()]} {format(new Date())}
               </div>
+            </div>
 
-              <div className="overflow-hidden border rounded-lg my-3">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+            {msg && toast.error(msg)}
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Horario
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Paciente
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Estado
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {listaCitas.length ? (
+                    listaCitas.map((cita) => (
+                      <PreviewConsulta key={cita.idCita} cita={cita} />
+                    ))
+                  ) : (
                     <tr>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-                      >
-                        Horario
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-                      >
-                        Cliente
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-                      ></th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-xs font-bold text-right text-gray-500 uppercase "
-                      ></th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {listaCitas.length ? (
-                      listaCitas.map((cita) => (
-                        <PreviewConsulta key={cita.idCita} cita={cita} />
-                      ))
-                    ) : (
-                      <tr>
-                        <td>
-                          <p className="text-center text-gray-600 uppercase p-5">
-                            No hay citas aun
+                      <td colSpan="4" className="px-6 py-4">
+                        <div className="flex flex-col items-center justify-center text-gray-500 py-4">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          </svg>
+                          <p className="text-center text-gray-600 font-medium">
+                            No hay consultas programadas para hoy
                           </p>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </Form>
-          );
-        }}
-      </Formik>
+                          <p className="text-sm text-gray-500">
+                            Las consultas aparecerán aquí cuando sean agendadas
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

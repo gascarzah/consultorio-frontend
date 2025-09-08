@@ -34,7 +34,7 @@ const ListarCita = () => {
   
   return (
     <>
-      <div className=" my-10 bg-white shadow rounded p-10 flex flex-col w-3/4  ">
+      <div className=" my-10 bg-white shadow rounded p-10 flex flex-col w-full">
         <Link
           to={"agregar-cita"}
           className="text-white bg-sky-600 text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center"

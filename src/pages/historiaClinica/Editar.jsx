@@ -1,35 +1,35 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {ClienteForm} from "../../components";
+import {HistoriaClinicaForm} from "../../components";
 import { useEffect } from "react";
 
 import { useDispatch } from "react-redux";
-import { getCliente } from "../../slices/clienteSlice";
+import { getHistoriaClinica } from "../../slices/historiaClinicaSlice";
 
-const EditarCliente = () => {
+const EditarHistoriaClinica = () => {
   const { numeroDocumento } = useParams();
   const dispatch = useDispatch();
-  const [cliente, setCliente] = useState({});
-  console.log("id EditarCliente", numeroDocumento);
+  const [historiaclinica, setHistoriaClinica] = useState({});
+  console.log("id EditarHistoriaClinica", numeroDocumento);
 
   useEffect(() => {
-    dispatch(getCliente(numeroDocumento))
+    dispatch(getHistoriaClinica(numeroDocumento))
       .unwrap()
       .then((resultado) => {
         console.log("resultado ", resultado);
-        setCliente(resultado);
+        setHistoriaClinica(resultado);
       });
   }, []);
 
   return (
     <>
       <h1 className=" text-sky-600 font-black text-3xl capitalize text-center">
-        Editar Cliente
+        Editar HistoriaClinica
       </h1>
 
-      <ClienteForm cliente={cliente} />
+      <HistoriaClinicaForm historiaclinica={historiaclinica} />
     </>
   );
 };
 
-export default EditarCliente;
+export default EditarHistoriaClinica;

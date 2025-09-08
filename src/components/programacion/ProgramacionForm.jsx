@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Formik, Form } from "formik";
+import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
 import DatePicker from "react-datepicker";
@@ -8,13 +8,17 @@ import DatePicker from "react-datepicker";
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import es from "date-fns/locale/es";
-import { Alerta } from "..";
 import { useDispatch, useSelector } from "react-redux";
 import { registrarProgramacion, resetState } from "../../slices/programacionSlice";
 // import { getEmpleadosPorEmpresa } from "../../slices/empleadoSlice";
 import { LISTAR_PROGRAMACION, MENSAJE_GUARDADO_EXITOSO, SWEET_GUARDO, SweetCrud, TIEMPO_REDIRECCION } from "../../utils";
+import { SWEET_MODIFICO, SWEET_SUCESS } from "../../utils";
+import { toast } from "react-toastify";
 
- const programacionSchema = Yup.object().shape({
+// Register the Spanish locale
+registerLocale("es", es);
+
+const programacionSchema = Yup.object().shape({
   fechaInicial: Yup.date().required("Fecha Inicial requerida"),
   fechaFinal: Yup.date().required("Fecha final requerida"),
 });
@@ -40,30 +44,36 @@ export const ProgramacionForm = () => {
   // }, [dispatch]);
 
   const handleSubmit = (values, resetForm) => {
+    if (!user?.idEmpresa) {
+      console.error("No se pudo obtener la empresa del usuario");
+      return;
+    }
+
     dispatch(
       registrarProgramacion({
         ...values,
-        idEmpresa: user?.idEmpresa,
+        idEmpresa: user.idEmpresa,
       })
     )
       .unwrap()
-
       .then((resultado) => {
         console.log("resultado ===>> ", resultado);
-
-        SweetCrud(SWEET_GUARDO,MENSAJE_GUARDADO_EXITOSO)
+        SweetCrud(SWEET_GUARDO, MENSAJE_GUARDADO_EXITOSO);
         navigate(LISTAR_PROGRAMACION);        
       })
       .catch((errores) => {
         console.log("errores ===>> ", errores);
-        
+        SweetCrud('Error', errores.message || 'No se pudo guardar');
+        setAlerta({
+          msg: errores || "Error al registrar la programación",
+          error: true
+        });
       });
   };
 
   const getMondayOfCurrentWeek = () => {
     const today = new Date();
     const first = today.getDate() - today.getDay() + 1;
-
     const monday = new Date(today.setDate(first));
     setMonday(monday);
   };
@@ -82,7 +92,6 @@ export const ProgramacionForm = () => {
     const today = new Date();
     const first = today.getDate() - today.getDay() + 1;
     const sixth = first + 6;
-
     const sunday = new Date(today.setDate(sixth));
     setSunday(sunday);
   };
@@ -91,79 +100,51 @@ export const ProgramacionForm = () => {
 
   return (
     <>
-      
-      {msg && <Alerta alerta={alerta} />}
+      <h1 className="text-sky-600 font-black text-3xl capitalize text-center mb-8">
+        Registrar Programación
+      </h1>
       <Formik
         initialValues={{
-          idProgramacion: "",
-          fechaInicial: monday,
-          fechaFinal: sunday,
-        }}
-        enableReinitialize={true}
-        onSubmit={(values, { resetForm }) => {
-          handleSubmit(values, resetForm);
-          //resetForm();
+          fechaInicial: monday || new Date(),
+          fechaFinal: sunday || new Date(),
         }}
         validationSchema={programacionSchema}
+        onSubmit={(values, { resetForm }) => handleSubmit(values, resetForm)}
+        enableReinitialize
       >
-        {({ errors, touched, values, handleChange, setFieldValue }) => {
-          return (
-            <Form className="my-10 bg-white shadow rounded p-10 w-2/5  ">
-              <div className="flex flex-row gap-10">
-                <div className="my-3 flex flex-col justify-evenly ">
-                  <label
-                    htmlFor="rango"
-                    className="uppercase text-gray-600 block font-bold"
-                  >
-                    Fecha inicial
-                  </label>
-                  <DatePicker
-                    selected={values.fechaInicial}
-                    dateFormat="dd/MM/yyyy"
-                    className="mt-3 p-3 border rounded-xl bg-gray-50 "
-                    name="fechaInicial"
-                    onChange={(date) => setFieldValue("fechaInicial", date)}
-                    locale="es"
-                    disabled="true"
-                  />{" "}
-                  {errors.fechaInicial && touched.fechaInicial ? (
-                    <Alerta msg={errors.fechaInicial} error={true} />
-                  ) : null}
-                </div>
-                <div className="my-3 flex flex-col justify-evenly ">
-                  <label
-                    htmlFor="rango"
-                    className="uppercase text-gray-600 block font-bold"
-                  >
-                    Fecha Final
-                  </label>
-                  <DatePicker
-                    selected={values.fechaFinal}
-                    dateFormat="dd/MM/yyyy"
-                    className=" mt-3 p-3 border rounded-xl bg-gray-50 "
-                    name="fechaFinal"
-                    onChange={(date) => setFieldValue("fechaFinal", date)}
-                    locale="es"
-                    disabled="true"
-                  />
-                  {errors.fechaFinal && touched.fechaFinal ? (
-                    <Alerta msg={errors.fechaFinal} error={true} />
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="flex-1">
-                <input
-                  type="submit"
-                  value="Registrar Programacion"
-                  className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
-                />
-              </div>
-            </Form>
-          );
-        }}
+        {({ errors, touched }) => (
+          <Form className="my-10 bg-white shadow rounded p-10 flex flex-col w-2/5">
+            <div className="my-3">
+              <label htmlFor="fechaInicial" className="uppercase text-gray-600 block font-bold">Fecha Inicial</label>
+              <Field
+                id="fechaInicial"
+                name="fechaInicial"
+                type="date"
+                className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+              />
+              {/* No mostrar mensaje visual aquí */}
+            </div>
+            <div className="my-3">
+              <label htmlFor="fechaFinal" className="uppercase text-gray-600 block font-bold">Fecha Final</label>
+              <Field
+                id="fechaFinal"
+                name="fechaFinal"
+                type="date"
+                className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+              />
+              {/* No mostrar mensaje visual aquí */}
+            </div>
+            <div>
+              <button
+                type="submit"
+                className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+              >
+                Registrar Programación
+              </button>
+            </div>
+          </Form>
+        )}
       </Formik>
-      
     </>
   );
 };

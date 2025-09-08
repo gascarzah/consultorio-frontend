@@ -1,9 +1,8 @@
-
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import {
-eliminarProgramacion,
+  eliminarProgramacion,
   getProgramacionesPaginado
 } from "../../slices/programacionSlice";
 
@@ -14,7 +13,7 @@ import { TableHeader } from "../../components/TableHeader";
 
 const headers = ['#','Fecha Inicio','Fecha Fin', 'Estado','']
 
-const ListarProgramacionDetalle = () => {
+const ListarProgramacion = () => {
   const { user } = useSelector((state) => state.usuario);
   const { programaciones, prev, next, total } = useSelector(
     (state) => state.programacion
@@ -33,51 +32,41 @@ const ListarProgramacionDetalle = () => {
     disabledPrev,
     setDisabledPrev,
     disabledNext,
-    setDisabledNext } = usePagination(programaciones, prev, next, getProgramacionesPaginado, user.idEmpresa)
-
+    setDisabledNext } = usePagination(programaciones, prev, next, getProgramacionesPaginado, user?.idEmpresa)
 
   const handleDelete = (id) => {
     SweetDelete(id, processDelete)
   }
 
   const processDelete = (id) => {
-
     dispatch(eliminarProgramacion(id))
       .unwrap()
       .then((resultado) => {
-
         const programacionesActualizados = listElementos.filter(
           (h) => h.idProgramacion !== parseInt(id)
         );
-
         setListElementos(programacionesActualizados);
-
       })
       .catch((errores) => {
-        console.log("Cita handleSubmit errores ===>> ", errores);
-
-
+        console.log("Error al eliminar programación ===>> ", errores);
       });
   };
 
   return (
     <>
-      <div className=" my-10 bg-white shadow rounded p-10 flex flex-col w-3/4  ">
-        {/* {listElementos.length < 1 ? ( */}
+      <div className="my-10 bg-white shadow rounded p-10 flex flex-col w-3/4">
         <Link
           className={`${
             listElementos.length > 0 ? "bg-sky-800" : "bg-sky-600"
           } text-white text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center`}
           to={"agregar-programacion"}
-          disabled={true}
         >
-          Generar Programacion
+          Generar Programación
         </Link>
 
         <table className="min-w-full divide-y divide-gray-200 mt-4">
-        <TableHeader headers={headers}/>
+          <TableHeader headers={headers}/>
           <tbody className="divide-y divide-gray-200">
-            {/* {console.log("listElementos == > ", listElementos)} */}
             {listElementos.length ? (
               listElementos.map((programacion) => (
                 <PreviewProgramacion
@@ -88,9 +77,9 @@ const ListarProgramacionDetalle = () => {
               ))
             ) : (
               <tr>
-                <td>
+                <td colSpan="5">
                   <p className="text-center text-gray-600 uppercase p-5">
-                    No hay programaciones aun
+                    No hay programaciones aún
                   </p>
                 </td>
               </tr>
@@ -116,4 +105,4 @@ const ListarProgramacionDetalle = () => {
   );
 };
 
-export default ListarProgramacionDetalle;
+export default ListarProgramacion;

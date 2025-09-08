@@ -6,13 +6,14 @@ import Modal from "react-modal";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
-import { Alerta, Pagination, AtencionDetalleModal } from "../../components";
+import { Pagination, AtencionDetalleModal } from "../../components";
 import regeneratorRuntime from "regenerator-runtime";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { getCita, getHistorialCitas, editarCita } from "../../slices/citaSlice";
 import { ITEMS_POR_PAGINA } from "../../utils";
+import { Odontograma } from "../../components/Odontograma/Odontograma";
 
 const customStyles = {
   content: {
@@ -53,6 +54,20 @@ const AgregarConsulta = () => {
 
   const [modal, setModal] = useState(false);
 
+  const [openSections, setOpenSections] = useState({
+    consulta: true,
+    odontograma: false,
+    informe: false,
+    historial: false
+  });
+
+  const toggleSection = (section) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
   useEffect(() => {
     dispatch(getCita(idCita));
     dispatch(
@@ -78,10 +93,23 @@ const AgregarConsulta = () => {
     resetTranscript,
     browserSupportsSpeechRecognition,
     browserSupportsContinuousListening,
-  } = useSpeechRecognition();
+  } = useSpeechRecognition({
+    continuous: true,
+    language: 'es-PE'
+  });
+
+  useEffect(() => {
+    // Actualizar el estado de play basado en listening
+    setPlay(listening);
+  }, [listening]);
 
   if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
+    return (
+      <div className="text-center p-4 bg-yellow-100 text-yellow-800 rounded-md">
+        Tu navegador no soporta el reconocimiento de voz.
+        Por favor, usa un navegador más moderno como Chrome.
+      </div>
+    );
   }
 
   const [alerta, setAlerta] = useState({});
@@ -95,7 +123,7 @@ const AgregarConsulta = () => {
     dispatch(
       editarCita({
         idCita: values.cita.idCita,
-        numeroDocumento: values.cita.cliente.numeroDocumento,
+        idHistoriaClinica: values.cita.historiaClinica.idHistoriaClinica,
         idHorario: values.cita.horario.idHorario,
         idProgramacionDetalle:
           values.cita.programacionDetalle.idProgramacionDetalle,
@@ -119,21 +147,36 @@ const AgregarConsulta = () => {
   };
 
   const handleStartRecord = () => {
-    setPlay(true);
-    SpeechRecognition.startListening({
-      continuous: true,
-      language: "es-PE",
-    });
+    try {
+      resetTranscript(); // Limpiar transcripción anterior
+      SpeechRecognition.startListening({
+        continuous: true,
+        language: 'es-PE'
+      });
+    } catch (error) {
+      console.error('Error al iniciar la grabación:', error);
+      toast.error('Error al iniciar la grabación');
+    }
   };
 
   const handleStopRecord = () => {
-    setPlay(false);
-    SpeechRecognition.stopListening();
+    try {
+      SpeechRecognition.stopListening();
+    } catch (error) {
+      console.error('Error al detener la grabación:', error);
+      toast.error('Error al detener la grabación');
+    }
   };
 
   const handleResetScript = () => {
-    setPlay(false);
-    resetTranscript();
+    try {
+      SpeechRecognition.stopListening();
+      resetTranscript();
+      setPlay(false);
+    } catch (error) {
+      console.error('Error al reiniciar la grabación:', error);
+      toast.error('Error al reiniciar la grabación');
+    }
   };
 
   const { msg } = alerta;
@@ -176,268 +219,313 @@ const AgregarConsulta = () => {
   }
   return (
     <>
-      <div className="flex justify-center gap-7  w-full">
-        <div>
-          <h1 className="text-sky-600 font-black text-3xl capitalize text-center">
-            Registrar Consulta
-          </h1>
-          {msg && <Alerta msg={alerta.msg} error={alerta.error} />}
-
-          <Formik
-            initialValues={{
-              nombres: cita.cliente?.nombres ?? "",
-              apellidoPaterno: cita.cliente?.apellidoPaterno ?? "",
-              apellidoMaterno: cita.cliente?.apellidoMaterno ?? "",
-              numeroDocumento: cita.cliente?.numeroDocumento ?? "",
-              cita,
-            }}
-            enableReinitialize={true}
-            onSubmit={(values, { resetForm }) => {
-              handleSubmit(values, resetForm);
-              //resetForm();
-            }}
-            validationSchema={nuevoClienteSchema}
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Acordeón de Registrar Consulta */}
+        <div className="mb-4">
+          <button
+            onClick={() => toggleSection('consulta')}
+            className="w-full bg-white p-4 flex justify-between items-center rounded-lg shadow-md hover:bg-gray-50 transition-colors"
           >
-            {({ errors, touched, values, handleChange }) => {
-              return (
-                <Form className=" my-10 bg-white shadow rounded p-10 flex  gap-10    ">
-                  <div className="w-full">
-                    <div className="my-3">
-                      <label
-                        htmlFor="numeroDocumento"
-                        className="uppercase text-gray-600 block font-bold"
-                        disabled="true"
-                      >
-                        Numero de Documento
-                      </label>
-                      <Field
-                        id="numeroDocumento"
-                        type="text"
-                        placeholder="Numero de documento"
-                        className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                        name={"numeroDocumento"}
-                        disabled="true"
-                      />
-                      {errors.numeroDocumento && touched.numeroDocumento ? (
-                        <Alerta>{errors.numeroDocumento}</Alerta>
-                      ) : null}
-                    </div>
-                    <div className="my-3   ">
-                      <label
-                        htmlFor="nombre"
-                        className="uppercase text-gray-600 block font-bold"
-                      >
-                        Nombre
-                      </label>
-                      <Field
-                        id="nombres"
-                        type="text"
-                        placeholder="Nombres"
-                        className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                        name={"nombres"}
-                        disabled="true"
-                      />
-                      {errors.nombres && touched.nombres ? (
-                        <Alerta>{errors.nombres}</Alerta>
-                      ) : null}
-                    </div>
-                    <div className="my-3">
-                      <label
-                        htmlFor="apellidoPaterno"
-                        className="uppercase text-gray-600 block font-bold"
-                      >
-                        Apellido Paterno
-                      </label>
-                      <Field
-                        id="apellidoPaterno"
-                        type="text"
-                        placeholder="Apellido Paterno"
-                        className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                        name={"apellidoPaterno"}
-                        disabled="true"
-                      />
-                      {errors.apellidoPaterno && touched.apellidoPaterno ? (
-                        <Alerta>{errors.apellidoPaterno}</Alerta>
-                      ) : null}
-                    </div>
-                    <div className="my-3">
-                      <label
-                        htmlFor="apellidoMaterno"
-                        className="uppercase text-gray-600 block font-bold"
-                      >
-                        Apellido Materno
-                      </label>
-                      <Field
-                        id="apellidoMaterno"
-                        type="text"
-                        placeholder="Apellido Materno"
-                        className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                        name={"apellidoMaterno"}
-                        disabled="true"
-                      />
-                      {errors.apellidoMaterno && touched.apellidoMaterno ? (
-                        <Alerta>{errors.apellidoMaterno}</Alerta>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="my-3 w-full">
-                    <label
-                      htmlFor="informe"
-                      className="uppercase text-gray-600 block font-bold"
-                    >
-                      Informe
-                    </label>
-                    {play && <p>Grabando</p>}
+            <h2 className="text-xl font-semibold text-gray-800">Registrar Consulta</h2>
+            <svg
+              className={`w-6 h-6 transform transition-transform ${openSections.consulta ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div className={`mt-2 transition-all duration-200 ease-in-out ${openSections.consulta ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+            <div className="bg-white shadow-lg rounded-lg p-6">
+              {msg && toast.error(msg)}
 
-                    <div className="flex flex-row gap-1 ">
+              <Formik
+                initialValues={{
+                  nombres: cita.historiaClinica?.nombres ?? "",
+                  apellidoPaterno: cita.historiaClinica?.apellidoPaterno ?? "",
+                  apellidoMaterno: cita.historiaClinica?.apellidoMaterno ?? "",
+                  numeroDocumento: cita.historiaClinica?.numeroDocumento ?? "",
+                  cita,
+                }}
+                enableReinitialize={true}
+                onSubmit={(values, { resetForm }) => {
+                  handleSubmit(values, resetForm);
+                }}
+                validationSchema={nuevoClienteSchema}
+              >
+                {({ errors, touched }) => (
+                  <Form className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <button
-                          type="button"
-                          onClick={handleStartRecord}
-                          className="bg-sky-700 mb-5 w-auto rounded py-3 text-white font-bold 
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+                        <label
+                          htmlFor="numeroDocumento"
+                          className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-6 h-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
-                            />
-                          </svg>
-                        </button>
+                          Número de Documento
+                        </label>
+                        <Field
+                          id="numeroDocumento"
+                          type="text"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-gray-50"
+                          name="numeroDocumento"
+                          disabled={true}
+                        />
+                        {errors.numeroDocumento && touched.numeroDocumento && (
+                          <div className="text-sm text-red-600">{errors.numeroDocumento}</div>
+                        )}
                       </div>
+
                       <div>
-                        <button
-                          type="button"
-                          onClick={handleStopRecord}
-                          className="bg-sky-700 mb-5 w-auto rounded py-3 text-white font-bold
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+                        <label
+                          htmlFor="nombres"
+                          className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-6 h-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15.75 5.25v13.5m-7.5-13.5v13.5"
-                            />
-                          </svg>
-                        </button>
+                          Nombre Completo
+                        </label>
+                        <Field
+                          id="nombres"
+                          type="text"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-gray-50"
+                          name="nombres"
+                          disabled={true}
+                        />
+                        {errors.nombres && touched.nombres && (
+                          <div className="text-sm text-red-600">{errors.nombres}</div>
+                        )}
                       </div>
+
                       <div>
-                        <button
-                          type="button"
-                          onClick={handleResetScript}
-                          className="bg-sky-700 mb-5 w-auto rounded py-3 text-white font-bold
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+                        <label
+                          htmlFor="motivo"
+                          className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          Reset
-                        </button>
+                          Motivo de la Consulta
+                        </label>
+                        <Field
+                          as="textarea"
+                          id="motivo"
+                          name="motivo"
+                          rows="4"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-gray-50"
+                          placeholder="Describa el motivo de la consulta"
+                        />
+                        {errors.motivo && touched.motivo && (
+                          <div className="text-sm text-red-600">{errors.motivo}</div>
+                        )}
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="diagnostico"
+                          className="block text-sm font-medium text-gray-700 mb-1"
+                        >
+                          Diagnóstico
+                        </label>
+                        <Field
+                          as="textarea"
+                          id="diagnostico"
+                          name="diagnostico"
+                          rows="4"
+                          className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-gray-50"
+                          placeholder="Ingrese el diagnóstico"
+                        />
+                        {errors.diagnostico && touched.diagnostico && (
+                          <div className="text-sm text-red-600">{errors.diagnostico}</div>
+                        )}
                       </div>
                     </div>
-                    <textarea
-                      className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                      value={transcript}
-                      placeholder="Informe"
-                      rows="10"
-                      cols="50"
-                      readOnly
-                    ></textarea>
-                    <div className="flex-1">
+
+                    <div>
                       <input
                         type="submit"
-                        value="Registrar Informe"
-                        className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+                        value="Registrar Consulta"
+                        className="w-full bg-sky-600 text-white py-3 px-4 rounded-md font-semibold hover:bg-sky-700 transition-colors cursor-pointer"
                       />
                     </div>
-                  </div>
-                </Form>
-              );
-            }}
-          </Formik>
+                  </Form>
+                )}
+              </Formik>
+            </div>
+          </div>
         </div>
-        <div>
-          {" "}
-          <h1 className="text-sky-600 font-black text-3xl capitalize text-center">
-            Historial de consultas
-          </h1>
-          {msg && <Alerta alerta={alerta} />}
-          <div className="flex flex-col bg-white mt-10">
-            <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
-                <div className="overflow-hidden">
-                  <table className="min-w-full text-left text-sm font-light">
-                    <thead className="border-b font-medium dark:border-neutral-500">
-                      <tr>
-                        <th scope="col" className="px-6 py-4">
-                          Fecha de Atencion
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {listaHistorial.length ? (
-                        listaHistorial.map((cita, index) => (
-                          <tr
-                            className="border-b dark:border-neutral-500"
-                            key={cita.idCita}
-                          >
-                            <td className="whitespace-nowrap px-6 py-4">
-                              <button
-                                type="button"
-                                className="bg-sky-600 hover:bg-sky-800 text-white w-full mt-5 p-3 uppercase font-bold"
-                                onClick={() => {
-                                  handleChangeModal(cita.informe);
-                                }}
-                              >
-                                {dayjs(cita.programacionDetalle.fecha).format(
-                                  "DD/MM/YYYY"
-                                )}
-                              </button>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td>
-                            <p className="text-center text-gray-600 uppercase p-5">
-                              No hay citas aun
-                            </p>
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+
+        {/* Acordeón de Odontograma */}
+        <div className="mb-4">
+          <button
+            onClick={() => toggleSection('odontograma')}
+            className="w-full bg-white p-4 flex justify-between items-center rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <h2 className="text-xl font-semibold text-gray-800">Odontograma</h2>
+            <svg
+              className={`w-6 h-6 transform transition-transform ${openSections.odontograma ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div className={`mt-2 transition-all duration-200 ease-in-out ${openSections.odontograma ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+            <div className="bg-white shadow-lg rounded-lg">
+              <Odontograma />
+            </div>
+          </div>
+        </div>
+
+        {/* Acordeón de Informe */}
+        <div className="mb-4">
+          <button
+            onClick={() => toggleSection('informe')}
+            className="w-full bg-white p-4 flex justify-between items-center rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <h2 className="text-xl font-semibold text-gray-800">Informe</h2>
+            <svg
+              className={`w-6 h-6 transform transition-transform ${openSections.informe ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div className={`mt-2 transition-all duration-200 ease-in-out ${openSections.informe ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+            <div className="bg-white shadow-lg rounded-lg p-6">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  {play ? (
+                    <button
+                      type="button"
+                      onClick={handleStopRecord}
+                      className="flex-1 px-4 py-2 rounded-md font-medium bg-red-500 text-white hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 3a1 1 0 00-1 1v12a1 1 0 002 0V4a1 1 0 00-1-1z" />
+                      </svg>
+                      Detener Dictado
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleStartRecord}
+                      className="flex-1 px-4 py-2 rounded-md font-medium bg-green-500 text-white hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                      </svg>
+                      Iniciar Dictado
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleResetScript}
+                    className="px-4 py-2 rounded-md font-medium bg-gray-500 text-white hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                    </svg>
+                    Limpiar
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <div className={`absolute -top-3 right-2 flex items-center gap-2 ${play ? 'text-red-500' : 'text-gray-400'}`}>
+                    {play && (
+                      <span className="flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                      </span>
+                    )}
+                    <span className="text-sm">{play ? 'Dictando...' : 'Dictado detenido'}</span>
+                  </div>
+                  <textarea
+                    className="w-full p-4 border border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-gray-50 mt-2"
+                    value={transcript}
+                    placeholder="Escriba o dicte el informe aquí..."
+                    rows="10"
+                    readOnly
+                  />
                 </div>
               </div>
             </div>
           </div>
-          {total && total > ITEMS_POR_PAGINA && ( 
-          <Pagination
-            totalPosts={listaHistorial.length}
-            itemsPerPage={itemsPerPage}
-            setCurrentPage={setCurrentPage}
-            currentPage={currentPage}
-            handlePrev={handlePrev}
-            handleNext={handleNext}
-            disabledPrev={disabledPrev}
-            setDisabledPrev={setDisabledPrev}
-            disabledNext={disabledNext}
-            setDisabledNext={setDisabledNext}
-          />
-          )}
+        </div>
+
+        {/* Acordeón de Historial */}
+        <div className="mb-4">
+          <button
+            onClick={() => toggleSection('historial')}
+            className="w-full bg-white p-4 flex justify-between items-center rounded-lg shadow-md hover:bg-gray-50 transition-colors"
+          >
+            <h2 className="text-xl font-semibold text-gray-800">Historial de Consultas</h2>
+            <svg
+              className={`w-6 h-6 transform transition-transform ${openSections.historial ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <div className={`mt-2 transition-all duration-200 ease-in-out ${openSections.historial ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+            <div className="bg-white shadow-lg rounded-lg p-6">
+              <div className="overflow-hidden rounded-lg border border-gray-200">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Fecha de Atención
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {listaHistorial.length ? (
+                      listaHistorial.map((cita) => (
+                        <tr key={cita.idCita}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              type="button"
+                              className="w-full text-left px-4 py-2 text-sm text-sky-600 hover:bg-sky-50 rounded transition-colors"
+                              onClick={() => handleChangeModal(cita.informe)}
+                            >
+                              {dayjs(cita.programacionDetalle.fecha).format("DD/MM/YYYY")}
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                          No hay consultas registradas
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {total && total > ITEMS_POR_PAGINA && (
+                <div className="mt-4">
+                  <Pagination
+                    totalPosts={listaHistorial.length}
+                    itemsPerPage={itemsPerPage}
+                    setCurrentPage={setCurrentPage}
+                    currentPage={currentPage}
+                    handlePrev={handlePrev}
+                    handleNext={handleNext}
+                    disabledPrev={disabledPrev}
+                    setDisabledPrev={setDisabledPrev}
+                    disabledNext={disabledNext}
+                    setDisabledNext={setDisabledNext}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {modal && (
@@ -445,7 +533,7 @@ const AgregarConsulta = () => {
             isOpen={modal}
             style={customStyles}
             onRequestClose={closeModal}
-            contentLabel="Detalle 24/09/2021"
+            contentLabel="Detalle de Consulta"
           >
             <AtencionDetalleModal informe={informe} />
           </Modal>

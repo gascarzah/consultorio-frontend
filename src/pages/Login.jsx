@@ -2,9 +2,8 @@ import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import * as Yup from "yup";
-import { Alerta } from "../components";
 
 import { login } from "../slices/authSlice";
 
@@ -17,34 +16,29 @@ const loginSchema = Yup.object().shape({
 
 const Login = () => {
   const [alerta, setAlerta] = useState({});
+  const [showErrorIcon, setShowErrorIcon] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleSubmit = (values) => {
     const { email, password } = values;
+    setShowErrorIcon(false);
 
     if (password.length < 6) {
-      setAlerta({
-        msg: "password es muy corto, agrega minimo 6 caracteres",
-        error: true,
-      });
-
+      toast.error("password es muy corto, agrega minimo 6 caracteres");
       return;
     }
 
     dispatch(login(values))
       .unwrap()
-
       .then((resultado) => {
         navigate("/dashboard");
-
-        // console.log("respuesta ", resultado);
       })
       .catch((errores) => {
         console.log("errores ===>> ", errores);
-
-        toast.error("usuario no existe");
+        setShowErrorIcon(true);
+        toast.error("Usuario no existe");
       });
   };
 
@@ -53,10 +47,9 @@ const Login = () => {
   return (
     <>
       <h1 className="text-sky-600 text-center font-black text-6xl ">
-        Inicia Sesion
+        Inicia Sesión
       </h1>
-      <ToastContainer />
-      {msg && <Alerta msg={alerta.msg} error={alerta.error} />}
+      {msg && toast.error(msg)}
 
       <Formik
         initialValues={{
@@ -71,6 +64,7 @@ const Login = () => {
         {({ errors, touched, values, handleChange }) => {
           return (
             <Form className={"my-10 bg-white shadow rounded p-10"}>
+
               <div className="my-5">
                 <label
                   htmlFor="email"
@@ -82,12 +76,10 @@ const Login = () => {
                   id="email"
                   type="email"
                   placeholder="Email"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
+                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
                   name={"email"}
                 />
-                {errors.email && touched.email ? (
-                  <Alerta msg={errors.email} error={true} />
-                ) : null}
+                {errors.email && touched.email && toast.error(errors.email)}
               </div>
               <div className="my-5">
                 <label
@@ -99,46 +91,29 @@ const Login = () => {
                 <Field
                   id="password"
                   type="password"
-                  placeholder="Password de Registro"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
+                  placeholder="Password"
+                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
                   name={"password"}
                 />
-                {errors.password && touched.password ? (
-                  <Alerta msg={errors.password} error={true} />
-                ) : null}
+                {errors.password && touched.password && toast.error(errors.password)}
               </div>
 
               <input
                 type="submit"
-                value="Iniciar Sesion"
+                value="Iniciar Sesión"
                 className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+                uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
               />
-               <Link
-          to={"/olvide-password"}
-          className={"block text-center my-5 text-slate-500 uppercase text-sm"}
-        >
-          Olvide mi password
-        </Link>
+              <Link
+                to={"/olvide-password"}
+                className={"block text-center my-5 text-slate-500 uppercase text-sm"}
+              >
+                Olvidé mi password
+              </Link>
             </Form>
-            
           );
         }}
       </Formik>
-      {/* <nav className={"lg:flex lg:justify-between"}>
-        <Link
-          to={"/registrar"}
-          className={"block text-center my-5 text-slate-500 uppercase text-sm"}
-        >
-          No tienes una cuenta? Registrate
-        </Link>
-        <Link
-          to={"/olvide-password"}
-          className={"block text-center my-5 text-slate-500 uppercase text-sm"}
-        >
-          Olvide mi password
-        </Link>
-      </nav> */}
     </>
   );
 };

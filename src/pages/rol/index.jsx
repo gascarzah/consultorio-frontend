@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+// import Modal from "react-modal";
 import { Link, Outlet } from "react-router-dom";
-import Modal from "react-modal";
-import { getClientesPaginado } from "../../slices/clienteSlice";
-import {PreviewCliente, Pagination} from "../../components";
-import AgregarCliente from "./Agregar";
-import { ITEMS_POR_PAGINA } from "../../utils";
 
+import {Pagination} from "../../components";
+import PreviewRol from "../../components/PreviewRol";
+import { getRolesPaginado } from "../../slices/rolSlice";
 
 const customStyles = {
   content: {
@@ -18,10 +17,10 @@ const customStyles = {
     transform: "translate(-50%, -50%)",
   },
 };
-Modal.setAppElement("#root");
-const ListarCliente = () => {
-  const { clientes, prev, next, total } = useSelector((state) => state.cliente);
-  const [listClientes, setListClientes] = useState([]);
+// Modal.setAppElement("#root");
+const ListarRol = () => {
+  const { roles, prev, next, total } = useSelector((state) => state.rol);
+  const [listRoles, setListRoles] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -30,16 +29,16 @@ const ListarCliente = () => {
   const [modal, setModal] = useState(false);
 
   useEffect(() => {
-    dispatch(getClientesPaginado({ page: currentPage, size: itemsPerPage }));
+    dispatch(getRolesPaginado({ page: currentPage, size: itemsPerPage }));
   }, []);
 
   useEffect(() => {
-    if (clientes) {
-      setListClientes(clientes);
+    if (roles) {
+      setListRoles(roles);
       setDisabledPrev(prev);
       setDisabledNext(next);
     }
-  }, [clientes, currentPage]);
+  }, [roles, currentPage]);
 
   const handlePrev = () => {
     console.log("handlePrev ", handlePrev);
@@ -62,24 +61,12 @@ const ListarCliente = () => {
 
   const pagination = (pagina) => {
     dispatch(
-      getClientesPaginado({
+      getRolesPaginado({
         page: pagina,
         size: itemsPerPage,
       })
     );
   };
-
-  const handleChangeModal = (informe) => {
-    setModal(!modal);
-    setInforme(informe);
-  };
-  function closeModal() {
-    setModal(false);
-  }
-
-  const deleteElement = (id) => {
-    console.log('borrao')
-  }
 
   const dispatch = useDispatch();
 
@@ -87,10 +74,10 @@ const ListarCliente = () => {
     <>
       <div className=" my-10 bg-white shadow rounded p-10 flex flex-col w-3/4  ">
         <Link
-          to={"agregar-cliente"}
-          className="text-white bg-sky-600 text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center"
+          to={"agregar-rol"}
+          className="text-white bg-indigo-600 text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center"
         >
-          Agregar Cliente
+          Agregar Rol
         </Link>
 
         <table className="min-w-full divide-y divide-gray-200 mt-4">
@@ -100,63 +87,39 @@ const ListarCliente = () => {
                 scope="col"
                 className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
               >
-                Apellido Paterno
+                Numero
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
               >
-                Apellido Materno
+                nombre
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Nombre
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Email
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-xs font-bold text-left text-gray-500 uppercase "
-              >
-                Direccion
-              </th>
+
               <th
                 scope="col"
                 className="px-6 py-3 text-xs font-bold text-right text-gray-500 uppercase "
-              >
-                Edit
-              </th>
+              ></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {listClientes.length ? (
-              listClientes.map((cliente) => (
-                <PreviewCliente
-                  key={cliente.numeroDocumento}
-                  cliente={cliente}
-                  deleteElement={deleteElement}
-                />
-              ))
+            {console.log("listRoles == > ", listRoles)}
+            {listRoles.length ? (
+              listRoles.map((rol) => <PreviewRol key={rol.idRol} rol={rol} />)
             ) : (
               <tr>
                 <td>
                   <p className="text-center text-gray-600 uppercase p-5">
-                    No hay clientes aun
+                    No hay roles aun
                   </p>
                 </td>
               </tr>
             )}
           </tbody>
         </table>
-        {total && total > ITEMS_POR_PAGINA && (
+        {total > 5 && (
           <Pagination
-            totalPosts={listClientes.length}
+            totalPosts={listRoles.length}
             itemsPerPage={itemsPerPage}
             setCurrentPage={setCurrentPage}
             currentPage={currentPage}
@@ -169,19 +132,8 @@ const ListarCliente = () => {
           />
         )}
       </div>
-
-      {modal && (
-        <Modal
-          isOpen={modal}
-          style={customStyles}
-          onRequestClose={closeModal}
-          contentLabel="Detalle 24/09/2021"
-        >
-          <AgregarCliente />
-        </Modal>
-      )}
     </>
   );
 };
 
-export default ListarCliente;
+export default ListarRol;

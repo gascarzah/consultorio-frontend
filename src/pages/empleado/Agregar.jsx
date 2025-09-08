@@ -3,13 +3,10 @@ import {EmpleadoForm} from "../../components";
 
 const AgregarEmpleado = () => {
   return (
-    <>
-      <h1 className=" text-sky-600 font-black text-3xl capitalize text-center">
-        Registrar Empleado
-      </h1>
+    <div className="flex justify-center items-center  flex-col">
 
       <EmpleadoForm />
-    </>
+    </div>
   );
 };
 

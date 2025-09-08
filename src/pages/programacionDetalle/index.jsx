@@ -9,8 +9,7 @@ import { usePagination } from "../../hook/usePagination";
 import { TableHeader } from "../../components/TableHeader";
 import { ITEMS_POR_PAGINA } from "../../utils";
 
-
-const headers = ['Dia','Fecha','Doctor', 'Registrados','acciones']
+const headers = ['Día','Fecha','Doctor', 'Registrados','Acciones']
 
 const ListarProgramacionDetalle = () => {
   const { programacionesDetalle, prev, next, total } = useSelector(
@@ -31,19 +30,17 @@ const ListarProgramacionDetalle = () => {
 
   return (
     <>
-      <div className=" my-10 bg-white shadow rounded p-10 flex flex-col w-3/4  ">
+      <div className="my-10 bg-white shadow rounded p-10 flex flex-col w-3/4">
         <Link
-          className="bg-sky-600 text-white text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center"
+          className="bg-sky-600 text-white text-sm p-3 rounded-md uppercase font-bold w-1/6 text-center hover:bg-sky-700 transition-colors"
           to={"agregar-programacion-detalle"}
-          disabled="true"
         >
-          Generar Programacion Detalle
+          Generar Programación Detalle
         </Link>
 
         <table className="min-w-full divide-y divide-gray-200 mt-4">
-        <TableHeader headers={headers}/>
+          <TableHeader headers={headers}/>
           <tbody className="divide-y divide-gray-200">
-
             {listElementos.length ? (
               listElementos.map((programacionDetalle) => (
                 <PreviewProgramacionDetalle
@@ -53,9 +50,9 @@ const ListarProgramacionDetalle = () => {
               ))
             ) : (
               <tr>
-                <td>
+                <td colSpan="5">
                   <p className="text-center text-gray-600 uppercase p-5">
-                    No hay programaciones aun
+                    No hay programaciones aún
                   </p>
                 </td>
               </tr>

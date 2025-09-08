@@ -18,13 +18,13 @@ export  const PreviewCita = ({ cita }) => {
           {cita?.horario?.descripcion}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {cita?.cliente?.apellidoPaterno} {cita?.cliente?.apellidoMaterno}{" "}
-          {cita?.cliente?.nombres}
+          {cita?.historiaClinica?.apellidoPaterno} {cita?.historiaClinica?.apellidoMaterno}{" "}
+          {cita?.historiaClinica?.nombres}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
-          {cita.programacionDetalle?.empleado?.persona?.apellidoPaterno}{" "}
-          {cita.programacionDetalle?.empleado?.persona?.apellidoMaterno}{" "}
-          {cita.programacionDetalle?.empleado?.persona?.nombres}
+          {cita.programacionDetalle?.empleado?.apellidoPaterno}{" "}
+          {cita.programacionDetalle?.empleado?.apellidoMaterno}{" "}
+          {cita.programacionDetalle?.empleado?.nombres}
         </td>
         <td className="px-6 py-4 text-sm text-gray-800 whitespace-nowrap">
           {cita.programacionDetalle?.empleado?.tipoEmpleado?.descripcion}

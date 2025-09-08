@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.jsx --fix"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
@@ -15,13 +16,14 @@
     "axios": "^0.27.2",
     "dayjs": "^1.11.7",
     "formik": "^2.2.9",
-    "frontendjs": "file:",
+    "html-to-docx": "^1.8.0",
     "jwt-decode": "^3.1.2",
     "react": "^18.2.0",
     "react-big-calendar": "^1.11.2",
     "react-calendar": "^4.8.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.5.2",
     "react-modal": "^3.16.1",
     "react-paginate": "^8.1.4",
     "react-redux": "^8.0.2",
@@ -35,10 +37,14 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.23.3",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^2.0.1",
     "autoprefixer": "^10.4.8",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.16",
     "tailwindcss": "^3.1.8",
     "vite": "^3.0.7"

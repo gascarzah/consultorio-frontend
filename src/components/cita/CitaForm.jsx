@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { format } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
-import { Alerta } from "../Alerta";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   resetState,
   getCitasIdProgramacionDetalle,
@@ -14,12 +14,14 @@ import {
 } from "../../slices/citaSlice";
 import { getEmpleadosPorEmpresa } from "../../slices/empleadoSlice";
 import { getProgramacionDetalles } from "../../slices/programacionDetalleSlice";
-
 import { getHorarios } from "../../slices/horarioSlice";
-import { getClientes } from "../../slices/clienteSlice";
+import { getHistoriaClinicas } from "../../slices/historiaClinicaSlice";
+import { getUsuario } from "../../slices/usuarioSlice";
+
 import { LISTAR_CITA, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, SWEET_GUARDO, SWEET_MODIFICO, SWEET_SUCESS, SweetCrud, TIEMPO_REDIRECCION } from "../../utils";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import { toast } from "react-toastify";
 
 const nuevaCitaSchema = Yup.object().shape({
   numeroDocumento: Yup.string().required("Debe seleccionar un medico"),
@@ -28,88 +30,127 @@ const nuevaCitaSchema = Yup.object().shape({
 });
 
 export const CitaForm = ({ cita }) => {
+  const { email } = useSelector((state) => state.auth);
   const { user } = useSelector((state) => state.usuario);
+  const { empleados } = useSelector((state) => state.empleado);
+  
   const [alerta, setAlerta] = useState({});
 
   const [dias, setDias] = useState([]);
   const [listaCitas, setListaCitas] = useState([]);
-  const [listaClientes, setListaClientes] = useState([]);
   const [listaHorarios, setListaHorarios] = useState([]);
   const [listaEmpleados, setListaEmpleados] = useState([]);
-
+  
   const [items, setItems] = useState([]);
-  const [cliente, setCliente] = useState([]);
-  const [clientes, setClientes] = useState([]);
+  const [handleSelectHistoriaClinica, setHandleSelectHistoriaClinica] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
+  const [listaHistoriaClinicas, setListaHistoriaClinicas] = useState([]);
   const [value, onChange] = useState(new Date());
 
+  useEffect(() => {
+    if (email) {
+      console.log("Obteniendo datos del usuario con email:", email);
+      dispatch(getUsuario(email))
+        .unwrap()
+        .then((resultado) => {
+          console.log("Datos del usuario obtenidos exitosamente:", resultado);
+        })
+        .catch((error) => {
+          console.error("Error al obtener datos del usuario:", error);
+          toast.error("Error al obtener datos del usuario");
+        });
+    }
+  }, [email, dispatch]);
 
   useEffect(() => {
-    dispatch(resetState());
+    if (user?.idEmpresa) {
+      console.log("Obteniendo empleados para la empresa ID:", user.idEmpresa);
+      dispatch(getEmpleadosPorEmpresa(user.idEmpresa))
+        .unwrap()
+        .then((resultado) => {
+          console.log("Lista de empleados obtenida:", resultado);
+          if (Array.isArray(resultado)) {
+            setListaEmpleados(resultado);
+          } else {
+            console.error("El resultado no es un array:", resultado);
+            setListaEmpleados([]);
+          }
+        })
+        .catch((errores) => {
+          console.error("Error al obtener empleados:", errores);
+          setListaEmpleados([]);
+          toast.error(errores.message || "Error al obtener la lista de empleados");
+        });
+    } else {
+      console.log("No hay ID de empresa disponible en user:", user);
+    }
+  }, [user?.idEmpresa, dispatch]);
+
+  useEffect(() => {
+    dispatch(getHorarios())
+      .unwrap()
+      .then((resultado) => {
+        console.log("Horarios obtenidos:", resultado);
+        setListaHorarios(resultado);
+      })
+      .catch((errores) => {
+        console.error("Error al obtener horarios:", errores);
+        setListaHorarios([]);
+        toast.error(errores.message || "Error al obtener horarios");
+      });
+  }, [dispatch]);
+
+  useEffect(() => {
+    // dispatch(resetState());
+    getHistoriasClinicas()
   }, []);
   useEffect(() => {
-    //console.log("viene de editar1 ", cita);
     if (cita) {
+      console.log("viene de editar1 ", cita);
       //console.log("viene de editar");
       handleProgramacionDetallada(
         cita?.programacionDetalle?.empleado?.numeroDocumento
       );
 
-      handleOnSelect({ id: cita?.cliente?.numeroDocumento });
+      handleOnSelect({ id: cita?.historiaClinica?.idHistoriaClinica });
+      // setHandleSelectHistoriaClinica({
+      //   idHistoriaClinica: cita?.historiaClinica?.idHistoriaClinica,
+      //   name: cita?.historiaClinica?.apellidoPaterno + " " +
+      //         cita?.historiaClinica?.apellidoMaterno + ", " +
+      //         cita?.historiaClinica?.nombres
+      // });
     }
   }, [cita]);
 
-  useEffect(() => {
-    //console.log(user.idEmpresa);
-    dispatch(getEmpleadosPorEmpresa(user.idEmpresa))
+  const getHistoriasClinicas = () => {
+    
+    dispatch(getHistoriaClinicas())
       .unwrap()
       .then((resultado) => {
-        setListaEmpleados(resultado);
-      })
-      .catch((errores) => {
-        //console.log("Cita handleSubmit errores ===>> ", errores);
-        setListaEmpleados([]);
-        toast.error(errores.message);
-      });
-
-    dispatch(getHorarios())
-      .unwrap()
-      .then((resultado) => {
-        setListaHorarios(resultado);
-      })
-      .catch((errores) => {
-        //console.log("Cita handleSubmit errores ===>> ", errores);
-        setListaHorarios([]);
-        toast.error(errores.message);
-      });
-
-    dispatch(getClientes())
-      .unwrap()
-      .then((resultado) => {
-        //console.log("resultado de resultado ", resultado);
-        setClientes(resultado);
-        const manyItems = resultado.map((cliente, i) => ({
-          id: cliente.historiaClinica,
+        console.log("resultado de getHistoriaClinicas ", resultado);
+        // setListaHistoriaClinicas(resultado);
+        const manyItems = resultado.map((historiaClinica, i) => ({
+          id: historiaClinica.idHistoriaClinica,
           name:
-            cliente.apellidoPaterno +
+          historiaClinica.apellidoPaterno +
             " " +
-            cliente.apellidoMaterno +
+            historiaClinica.apellidoMaterno +
             ", " +
-            cliente.nombres,
+            historiaClinica.nombres,
         }));
 
         console.log(manyItems)
-        setListaClientes(manyItems);
+        setListaHistoriaClinicas(manyItems);
       })
       .catch((errores) => {
        // console.log("Cita handleSubmit errores ===>> ", errores);
-        setListaClientes([]);
+        setListaHistoriaClinicas([]);
         toast.error(errores.message);
       });
-    //console.log(" useeffect ===>>>> ", items);
-  }, [dispatch]);
+  }
+
 
   const handleSubmit = (values, resetForm) => {
 console.log('si esta activo ',values)
@@ -117,7 +158,7 @@ console.log('si esta activo ',values)
       dispatch(
         editarCita({
           ...values,
-          historiaClinica: values.historiaClinica,
+          idHistoriaClinica: values.idHistoriaClinica,
           atendido: false,
         })
       )
@@ -134,7 +175,7 @@ console.log('si esta activo ',values)
 
       const valores = {
         ...values,
-        historiaClinica: cliente.id,
+        idHistoriaClinica: handleSelectHistoriaClinica.id,
         atendido: false,
       };
 
@@ -224,7 +265,7 @@ console.log('si esta activo ',values)
     console.log("handleOnSelect");
     // the item selected
     console.log(item);
-    setCliente(item);
+    setHandleSelectHistoriaClinica(item);
   };
 
   const handleOnFocus = () => {
@@ -247,7 +288,7 @@ console.log('si esta activo ',values)
   return (
     <>
       {" "}
-      {msg && <Alerta msg={alerta.msg} error={alerta.error} />}
+      {msg && toast.error(msg)}
       <Formik
         initialValues={{
           idCita: cita?.idCita ?? "",
@@ -256,7 +297,7 @@ console.log('si esta activo ',values)
           idProgramacionDetalle:
             cita?.programacionDetalle?.idProgramacionDetalle ?? "",
           idHorario: cita?.horario?.idHorario ?? "",
-          historiaClinica: cita?.cliente?.historiaClinica ?? "",
+          idHistoriaClinica: cita?.historiaClinica?.idHistoriaClinica ?? "",
         }}
         enableReinitialize={true}
         onSubmit={(values, { resetForm }) => {
@@ -267,6 +308,12 @@ console.log('si esta activo ',values)
       >
         {({ errors, touched, values, handleChange, setFieldValue }) => {
           return (
+
+            <>
+                  <h1 className="text-sky-600 font-black text-3xl capitalize text-center mb-8">
+        {cita?.idCita ? "Editar Cita" : "Registrar Cita"}
+      </h1>
+            
             <Form className="my-10 bg-white shadow rounded p-10 w-2/5 flex flex-col ">
               {console.log("errors ==>> ", errors)}
               {console.log("values ==>> ", values)} 
@@ -300,16 +347,14 @@ console.log('si esta activo ',values)
                           key={empleado.numeroDocumento}
                           value={empleado.numeroDocumento}
                         >
-                          {empleado.persona.apellidoPaterno}{" "}
-                          {empleado.persona.apellidoMaterno},{" "}
-                          {empleado.persona.nombres}
+                          {empleado.apellidoPaterno}{" "}
+                          {empleado.apellidoMaterno},{" "}
+                          {empleado.nombres}
                         </option>
                       );
                     })}
                 </select>
-                {errors.numeroDocumento && touched.numeroDocumento ? (
-                  <Alerta msg={errors.numeroDocumento} error={true} />
-                ) : null}
+                {errors.numeroDocumento && touched.numeroDocumento && toast.error(errors.numeroDocumento)}
               </div>
 
                   {/* <div className="my-3">
@@ -346,15 +391,13 @@ console.log('si esta activo ',values)
                           key={item.idProgramacionDetalle}
                           value={item.idProgramacionDetalle}
                         >
-                          {item.diaSemana}
+                          {item.diaSemana} (<strong>{item.fecha.split("-").reverse().join("/")}</strong>)
                         </option>
                       );
                     })}
                 </select>
                 {errors.idProgramacionDetalle &&
-                touched.idProgramacionDetalle ? (
-                  <Alerta msg={errors.idProgramacionDetalle} error={true} />
-                ) : null}
+                touched.idProgramacionDetalle && toast.error(errors.idProgramacionDetalle)}
               </div>
 
               <div className="my-3">
@@ -389,9 +432,7 @@ console.log('si esta activo ',values)
                       );
                     })}
                 </select>
-                {errors.idHorario && touched.idHorario ? (
-                  <Alerta msg={errors.idHorario} error={true} />
-                ) : null}
+                {errors.idHorario && touched.idHorario && toast.error(errors.idHorario)}
               </div>
 
               <div className="my-3">
@@ -406,31 +447,28 @@ console.log('si esta activo ',values)
                   
                   <div className="my-3">
                     <select
-                      name="historiaClinica"
-                      value={values.historiaClinica}
+                      name="idHistoriaClinica"
+                      value={values.idHistoriaClinica}
                       // onChange={values.handleChange}
                       onChange={async (e) => {
-                        console.log('historia clinica va', values)
+                        
                         const { value } = e.target;
                         console.log('historia clinica', value)
-                        setFieldValue("historiaClinica", value);
+                        setFieldValue("idHistoriaClinica", value);
                       }}
                       className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
                     >
                       <option value="" label="Selecciona un cliente">
                         Select un Cliente{" "}
                       </option>
-                      {clientes?.map((item, index) => {
+                      
+                      {listaHistoriaClinicas?.map((item, index) => {
                         return (
                           <option
-                            key={item.historiaClinica}
-                            value={item.historiaClinica}
+                            key={item.id}
+                            value={item.id}
                           >
-                            {item.apellidoPaterno +
-                              " " +
-                              item.apellidoMaterno +
-                              ", " +
-                              item.nombres}
+                            {item.name}
                           </option>
                         );
                       })}
@@ -438,7 +476,7 @@ console.log('si esta activo ',values)
                   </div>
                 ) : (
                   <ReactSearchAutocomplete
-                    items={listaClientes}
+                    items={listaHistoriaClinicas}
                     onSearch={handleOnSearch}
                     onHover={handleOnHover}
                     onSelect={handleOnSelect}
@@ -457,6 +495,7 @@ console.log('si esta activo ',values)
                 />
               </div>
             </Form>
+            </>
           );
         }}
       </Formik>

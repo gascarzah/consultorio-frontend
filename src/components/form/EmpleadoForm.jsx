@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Formik, Field, Form } from "formik";
+import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { ToastContainer, toast } from "react-toastify";
 
-import { registrarEmpleado } from "../../slices/empleadoSlice";
-import { Alerta } from "../Alerta";
+import { registrarEmpleado, modificarEmpleado } from "../../slices/empleadoSlice";
+import { getRoles } from "../../slices/rolSlice";
+import { getEmpresas } from "../../slices/empresaSlice";
+import { resetState } from "../../slices/rolMenuSlice";
 import { LISTAR_EMPLEADO, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, TIEMPO_REDIRECCION } from "../../utils";
+import { toast } from "react-toastify";
+import { SWEET_GUARDO, SWEET_MODIFICO, SWEET_SUCESS, SweetCrud } from "../../utils";
 
- const empleadoSchema = Yup.object().shape({
-  nombres: Yup.string().required("El nombre del cliente es obligatorio"),
+const empleadoSchema = Yup.object().shape({
+  nombres: Yup.string().required("El nombre del empleado es obligatorio"),
   apellidoPaterno: Yup.string().required("Apellido Paterno obligatorio"),
   apellidoMaterno: Yup.string().required("Apellido Materno obligatorio"),
   numeroDocumento: Yup.string()
@@ -21,29 +24,200 @@ import { LISTAR_EMPLEADO, MENSAJE_GUARDADO_EXITOSO, MENSAJE_MODIFICADO_EXITOSO, 
     .email("Email no valido")
     .required("El email es obligatorio"),
   direccion: Yup.string().required("Direccion obligatorio"),
-  idTipoEmpleado: Yup.string().required("Tipo empleado obligatorio"),
+  idRol: Yup.string().required("Rol es obligatorio"),
+  idEmpresa: Yup.string().required("Seleccionar una empresa"),
 });
 
-export const EmpleadoForm = ({ cliente }) => {
+function EmpleadoFormInner({ errors, touched, roles, empresas, handleSubmit, empleado }) {
+  // useEffect(() => {
+  //   Object.keys(errors).forEach((key) => {
+  //     if (errors[key] && touched[key]) {
+  //       toast.error(errors[key]);
+  //     }
+  //   });
+  // }, [errors, touched]);
+
+  return (
+    <Form className="my-10 bg-white shadow rounded p-10 flex flex-col w-2/5">
+      <div className="my-3">
+        <label htmlFor="nombres" className="uppercase text-gray-600 block font-bold">
+          Nombres
+        </label>
+        <Field
+          id="nombres"
+          type="text"
+          placeholder="Nombres"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          name="nombres"
+        />
+        <ErrorMessage
+          name="nombres"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="apellidoPaterno" className="uppercase text-gray-600 block font-bold">
+          Apellido Paterno
+        </label>
+        <Field
+          id="apellidoPaterno"
+          type="text"
+          placeholder="Apellido Paterno"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          name="apellidoPaterno"
+        />
+        <ErrorMessage
+          name="apellidoPaterno"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="apellidoMaterno" className="uppercase text-gray-600 block font-bold">
+          Apellido Materno
+        </label>
+        <Field
+          id="apellidoMaterno"
+          type="text"
+          placeholder="Apellido Materno"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          name="apellidoMaterno"
+        />
+        <ErrorMessage
+          name="apellidoMaterno"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="numeroDocumento" className="uppercase text-gray-600 block font-bold">
+          Número de Documento
+        </label>
+        <Field
+          id="numeroDocumento"
+          type="text"
+          placeholder="Número de Documento"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          name="numeroDocumento"
+        />
+        <ErrorMessage
+          name="numeroDocumento"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="email" className="uppercase text-gray-600 block font-bold">
+          Email
+        </label>
+        <Field
+          id="email"
+          type="email"
+          placeholder="Email"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          name="email"
+        />
+        <ErrorMessage
+          name="email"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="direccion" className="uppercase text-gray-600 block font-bold">
+          Dirección
+        </label>
+        <Field
+          id="direccion"
+          type="text"
+          placeholder="Dirección"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+          name="direccion"
+        />
+        <ErrorMessage
+          name="direccion"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="idRol" className="uppercase text-gray-600 block font-bold">
+          Rol
+        </label>
+        <Field
+          as="select"
+          id="idRol"
+          name="idRol"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+        >
+          <option value="">Selecciona un rol</option>
+          {roles && roles.map((rol) => (
+            <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
+          ))}
+        </Field>
+        <ErrorMessage
+          name="idRol"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div className="my-3">
+        <label htmlFor="idEmpresa" className="uppercase text-gray-600 block font-bold">
+          Empresa
+        </label>
+        <Field
+          as="select"
+          id="idEmpresa"
+          name="idEmpresa"
+          className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+        >
+          <option value="">Selecciona una empresa</option>
+          {empresas && empresas.map((empresa) => (
+            <option key={empresa.idEmpresa} value={empresa.idEmpresa}>{empresa.nombre}</option>
+          ))}
+        </Field>
+        <ErrorMessage
+          name="idEmpresa"
+          component="div"
+          className="text-red-500 text-sm mt-1"
+        />
+      </div>
+
+      <div>
+        <button
+          type="submit"
+          className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
+        >
+          Registrar Empleado
+        </button>
+      </div>
+    </Form>
+  );
+}
+
+export const EmpleadoForm = ({ empleado }) => {
+  console.log("empleado que llega al form ===>> ", empleado);
+  const { empresas } = useSelector((state) => state.empresa);
+  const { roles } = useSelector((state) => state.rol);
+  const { rolMenus } = useSelector((state) => state.rolMenu);
   const [alerta, setAlerta] = useState({});
-  const [listTipoEmpleados, setListTipoEmpleados] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getTipoEmpleados())
-      .unwrap()
-      .then((resultado) => {
-        // console.log("resultado getTipoEmpleados ===>> ", resultado);
-        setListTipoEmpleados(resultado);
-      })
-      .catch((errores) => {
-        console.log("errores ===>> ", errores);
-        setListTipoEmpleados([]);
-        toast.error(errores.message);
-      });
-  }, []);
+    dispatch(resetState());
+    dispatch(getRoles());
+    dispatch(getEmpresas());
+  }, [dispatch]);
 
   const handleSubmit = (values, resetForm) => {
     if (!values.idEmpleado) {
@@ -51,7 +225,7 @@ export const EmpleadoForm = ({ cliente }) => {
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);
-          toast.success(MENSAJE_GUARDADO_EXITOSO);
+          SweetCrud(SWEET_GUARDO, SWEET_SUCESS);
           dispatch(resetState());
           setTimeout(() => {
             navigate(LISTAR_EMPLEADO);
@@ -59,23 +233,22 @@ export const EmpleadoForm = ({ cliente }) => {
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
-          toast.error(errores.message);
+          SweetCrud('Error', errores.message || 'No se pudo guardar');
         });
     } else {
       dispatch(modificarEmpleado(values))
         .unwrap()
         .then((resultado) => {
-          console.log("resultado modificarCliente ===>> ", resultado);
+          console.log("resultado modificarempleado ===>> ", resultado);
           dispatch(resetState());
-          toast.success(MENSAJE_MODIFICADO_EXITOSO);
-          dispatch(resetState());
+          SweetCrud(SWEET_MODIFICO, SWEET_SUCESS);
           setTimeout(() => {
             navigate(LISTAR_EMPLEADO);
           }, TIEMPO_REDIRECCION);
         })
         .catch((errores) => {
           console.log("errores ===>> ", errores);
-          toast.error(errores.message);
+          SweetCrud('Error', errores.message || 'No se pudo modificar');
         });
     }
   };
@@ -84,157 +257,36 @@ export const EmpleadoForm = ({ cliente }) => {
 
   return (
     <>
-      {msg && <Alerta alerta={alerta} />}
-
+      <h1 className="text-sky-600 font-black text-3xl capitalize text-center mb-8">
+        {empleado?.idEmpleado ? "Editar Empleado" : "Registrar Empleado"}
+      </h1>
       <Formik
         initialValues={{
-          idEmpleado: cliente?.idCliente,
-          nombres: cliente?.nombres,
-          apellidoPaterno: cliente?.apellidoPaterno,
-          apellidoMaterno: cliente?.apellidoMaterno,
-          numeroDocumento: cliente?.numeroDocumento,
-          email: cliente?.email,
-          direccion: cliente?.direccion,
-          idTipoEmpleado: cliente?.tipoEmpleado?.idTipoEmpleado,
-          idEmpresa: 1,
+          nombres: empleado?.nombres || "",
+          apellidoPaterno: empleado?.apellidoPaterno || "",
+          apellidoMaterno: empleado?.apellidoMaterno || "",
+          numeroDocumento: empleado?.numeroDocumento || "",
+          email: empleado?.email || "",
+          direccion: empleado?.direccion || "",
+          idRol: empleado?.idRol || "",
+          idEmpresa: empleado?.idEmpresa || "",
         }}
         enableReinitialize={true}
         onSubmit={(values, { resetForm }) => {
           handleSubmit(values, resetForm);
-          //resetForm();
         }}
         validationSchema={empleadoSchema}
       >
-        {({ errors, touched, values, handleChange, setFieldValue }) => {
-          return (
-            <Form className=" my-10 bg-white shadow rounded p-10 flex flex-col w-2/5   ">
-              <div className="my-3">
-                <label
-                  htmlFor="numeroDocumento"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  Numero de Documento
-                </label>
-                <Field
-                  id="numeroDocumento"
-                  type="text"
-                  placeholder="Numero de documento"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  style={{ display: "block" }}
-                  name={"numeroDocumento"}
-                />
-                {errors.numeroDocumento && touched.numeroDocumento ? (
-                  <Alerta>{errors.numeroDocumento}</Alerta>
-                ) : null}
-              </div>
-              <div className="my-3   ">
-                <label
-                  htmlFor="nombre"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  Nombre
-                </label>
-                <Field
-                  id="nombres"
-                  type="text"
-                  placeholder="Nombres"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  name={"nombres"}
-                />
-                {errors.nombres && touched.nombres ? (
-                  <Alerta>{errors.nombres}</Alerta>
-                ) : null}
-              </div>
-              <div className="my-3">
-                <label
-                  htmlFor="apellidoPaterno"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  Apellido Paterno
-                </label>
-                <Field
-                  id="apellidoPaterno"
-                  type="text"
-                  placeholder="Apellido Paterno"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  name={"apellidoPaterno"}
-                />
-                {errors.apellidoPaterno && touched.apellidoPaterno ? (
-                  <Alerta>{errors.apellidoPaterno}</Alerta>
-                ) : null}
-              </div>
-              <div className="my-3">
-                <label
-                  htmlFor="apellidoMaterno"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  Apellido Materno
-                </label>
-                <Field
-                  id="apellidoMaterno"
-                  type="text"
-                  placeholder="Apellido Materno"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  name={"apellidoMaterno"}
-                />
-                {errors.apellidoMaterno && touched.apellidoMaterno ? (
-                  <Alerta>{errors.apellidoMaterno}</Alerta>
-                ) : null}
-              </div>
-
-              <div className="my-3">
-                <label
-                  htmlFor="email"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  Email
-                </label>
-                <Field
-                  id="email"
-                  type="email"
-                  placeholder="Email de Registro"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  name={"email"}
-                />
-                {errors.email && touched.email ? (
-                  <Alerta>{errors.email}</Alerta>
-                ) : null}
-              </div>
-
-              <div className="my-3">
-                <label
-                  htmlFor="direccion"
-                  className="uppercase text-gray-600 block font-bold"
-                >
-                  direccion
-                </label>
-                <Field
-                  id="direccion"
-                  type="direccion"
-                  placeholder="direccion de Registro"
-                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50 "
-                  name={"direccion"}
-                />
-                {errors.direccion && touched.direccion ? (
-                  <Alerta>{errors.direccion}</Alerta>
-                ) : null}
-              </div>
-
-              <div className="">
-                <input
-                  type="submit"
-                  value="Registrar Cliente"
-                  className="bg-sky-700 mb-5 w-full rounded py-3 text-white font-bold
-            uppercase hover:cursor-pointer hover:bg-sky-800 transition-colors"
-                />
-              </div>
-            </Form>
-          );
-        }}
+        {(formikProps) => (
+          <EmpleadoFormInner
+            {...formikProps}
+            roles={roles}
+            empresas={empresas}
+            handleSubmit={handleSubmit}
+            empleado={empleado}
+          />
+        )}
       </Formik>
-      <ToastContainer/>
     </>
   );
 };
-
-

@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-import { ToastContainer, toast } from "react-toastify";
 
 import { useDispatch, useSelector } from "react-redux";
 import { registrarUsuario, resetState } from "../slices/usuarioSlice";
 import { getRoles } from "../slices/rolSlice";
 import { getEmpresas } from "../slices/empresaSlice";
 import { Alerta } from "../components";
+import { toast } from "react-toastify";
 
 const nuevoUsuarioSchema = Yup.object().shape({
   nombres: Yup.string().required("El nombre del cliente es obligatorio"),
@@ -98,7 +98,6 @@ const RegistrarUsuario = () => {
       </h1>
 
       {msg && <Alerta msg={msg} error={true} />}
-      <ToastContainer />
       <Formik
         initialValues={{
           nombres: "",

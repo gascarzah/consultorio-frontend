@@ -32,8 +32,8 @@ export const getListaCitados = createAsyncThunk(
     try {
       const { data } = await clienteAxios.get('/citas/listaCitados', {
         params: {
-          numeroDocumento: values.idEmpleado.numeroDocumento, 
-          idEmpresa: values.idEmpleado.idEmpresa,
+          idEmpleado: values.idEmpleado, 
+          idEmpresa: values.idEmpresa,
           numeroDiaSemana: values.numeroDiaSemana,
         },
       });

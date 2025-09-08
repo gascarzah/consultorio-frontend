@@ -22,13 +22,11 @@ const EditarCita = () => {
       });
   }, []);
   return (
-    <>
-      <h1 className="text-sky-600 font-black text-3xl capitalize text-center">
-        Editar Cita
-      </h1>
+    <div className="flex justify-center items-center  flex-col ">
+     
 
       <CitaForm cita={cita} />
-    </>
+    </div>
   );
 };
 

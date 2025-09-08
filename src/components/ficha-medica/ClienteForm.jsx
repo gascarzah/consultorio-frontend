@@ -1,31 +1,51 @@
 import React, { useState } from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { Formik, Field, Form } from "formik";
 import * as Yup from "yup";
-import { ToastContainer, toast } from "react-toastify";
-import { Alerta } from "../Alerta";
+import { toast } from "react-toastify";
+import { SWEET_GUARDO, SWEET_MODIFICO, SWEET_SUCESS, SweetCrud } from "../../utils";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { modificarCliente, registrarCliente } from "../../slices/clienteSlice";
 
 const clienteSchema = Yup.object().shape({
-  nombres: Yup.string().required("El nombre es obligatorio"),
-  apellidoPaterno: Yup.string().required("Apellido paterno obligatorio"),
-  apellidoMaterno: Yup.string().required("Apellido materno obligatorio"),
+  nombres: Yup.string().required("El nombre del cliente es obligatorio"),
+  apellidoPaterno: Yup.string().required("Apellido Paterno obligatorio"),
+  apellidoMaterno: Yup.string().required("Apellido Materno obligatorio"),
   numeroDocumento: Yup.string()
-    .length(8, "Debe tener 8 dígitos")
-    .matches(/^\d+$/, "Debe contener solo números")
-    .required("Número de documento obligatorio"),
-  email: Yup.string().email("Email no válido").required("El email es obligatorio"),
-  direccion: Yup.string().required("La dirección es obligatoria"),
+    .max(8, "Numero de documento debe tener solo 8 digitos")
+    .required("Dni es obligatorio")
+    .matches(/^[0-9]+$/, "Dni debe tener solo numeros"),
+  email: Yup.string().email("Email no valido").required("El email es obligatorio"),
+  direccion: Yup.string().required("Direccion obligatorio"),
 });
 
-export const ClienteForm = ({ cliente, handleSubmit, handleGetCliente, antecedenteMedico }) => {
+export const ClienteForm = ({ cliente, antecedenteMedico,  handleGetCliente }) => {
   const [alerta, setAlerta] = useState({});
   const { msg } = alerta;
 
-  return (
-    <div className="w-full flex justify-center">
-      {msg && <Alerta alerta={alerta} />}
+  const dispatch = useDispatch();
+    const navigate = useNavigate();
+  const handleSubmit = async (values) => {
+    console.log('valores enviados ', values)
+    const action = values?.historiaClinica ? modificarCliente : registrarCliente;
 
+    try {
+      const resultado = await dispatch(action(values)).unwrap();
+      //setCliente(resultado);
+      SweetCrud(values?.historiaClinica ? SWEET_MODIFICO : SWEET_GUARDO, SWEET_SUCESS);
+    } catch (error) {
+      SweetCrud('Error', error.message || 'No se pudo guardar');
+    }
+  };
+  return (
+    <div>
+      <h1 className="text-sky-600 font-black text-3xl capitalize text-center mb-8">
+        {cliente?.historiaClinica ? "Editar Cliente" : "Registrar Cliente"}
+      </h1>
+      {msg && toast.error(msg)}
       <Formik
         initialValues={{
+          historiaClinica: cliente?.historiaClinica || "",
           nombres: cliente?.nombres || "",
           apellidoPaterno: cliente?.apellidoPaterno || "",
           apellidoMaterno: cliente?.apellidoMaterno || "",
@@ -38,130 +58,76 @@ export const ClienteForm = ({ cliente, handleSubmit, handleGetCliente, anteceden
           motivo: antecedenteMedico?.motivo || "",
         }}
         enableReinitialize
+        onSubmit={(values, { resetForm }) => {
+          handleSubmit(values, resetForm);
+        }}
         validationSchema={clienteSchema}
-        onSubmit={(values, { resetForm }) => handleSubmit(values, resetForm)}
       >
-        {({ values }) => (
-          <Form className="bg-white shadow-md rounded-lg p-8 w-full max-w-6xl">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-
-              {/* Información del cliente */}
-              <div className="col-span-1">
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-bold mb-1" htmlFor="numeroDocumento">
-                    Número de Documento
+        {({ errors, touched, values }) => (
+          
+          <Form className="my-10 bg-white shadow rounded p-10 flex flex-col w-2/5">
+            {console.log("errors ==>> ", errors)}
+            {console.log("values ==>> ", values)} 
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: "Historia Clínica", name: "historiaClinica", type: "text" },
+                { label: "Número de Documento", name: "numeroDocumento", type: "text", isSearchable: true },
+                { label: "Nombre", name: "nombres", type: "text" },
+                { label: "Apellido Paterno", name: "apellidoPaterno", type: "text" },
+                { label: "Apellido Materno", name: "apellidoMaterno", type: "text" },
+                { label: "Email", name: "email", type: "email" },
+                { label: "Dirección", name: "direccion", type: "text" },
+                { label: "Alergias", name: "alergia", type: "text" },
+                { label: "Antecedentes Médicos", name: "antecedentesMedicos", type: "text" },
+                { label: "Ectoscopia", name: "ectoscopia", type: "text" },
+              ].map(({ label, name, type, isSearchable }) => (
+                <div key={name} className="my-3">
+                  <label htmlFor={name} className="uppercase text-gray-600 block font-bold">
+                    {label}
                   </label>
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-2">
                     <Field
-                      id="numeroDocumento"
-                      type="text"
-                      name="numeroDocumento"
-                      placeholder="Número de documento"
-                      className="w-full p-3 border rounded-lg bg-gray-100 focus:ring focus:ring-blue-300"
+                      id={name}
+                      type={type}
+                      placeholder={label}
+                      className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+                      name={name}
                     />
-                    <button
-                      type="button"
-                      onClick={() => handleGetCliente(values.numeroDocumento)}
-                      className="ml-2 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                    >
-                      🔍
-                    </button>
+                    {isSearchable && (
+                      <button type="button" onClick={() => handleGetCliente(values.numeroDocumento)}>
+                        🔍
+                      </button>
+                    )}
                   </div>
-                  <ErrorMessage name="numeroDocumento" component={Alerta} className="text-red-500 text-sm mt-1" />
+                  {errors[name] && touched[name] && toast.error(errors[name])}
                 </div>
-
-                {[{ label: "Nombre", name: "nombres" },
-                  { label: "Apellido Paterno", name: "apellidoPaterno" },
-                  { label: "Apellido Materno", name: "apellidoMaterno" }]
-                  .map(({ label, name }) => (
-                    <div className="mb-4" key={name}>
-                      <label className="block text-gray-700 font-bold mb-1" htmlFor={name}>
-                        {label}
-                      </label>
-                      <Field
-                        id={name}
-                        type="text"
-                        name={name}
-                        placeholder={label}
-                        className="w-full p-3 border rounded-lg bg-gray-100 focus:ring focus:ring-blue-300"
-                      />
-                      <ErrorMessage name={name} component={Alerta} className="text-red-500 text-sm mt-1" />
-                    </div>
-                  ))}
+              ))}
+              <div className="my-3 col-span-2">
+                <label htmlFor="motivo" className="uppercase text-gray-600 block font-bold">
+                  Motivo
+                </label>
+                <Field
+                  id="motivo"
+                  component="textarea"
+                  rows="4"
+                  placeholder="Motivo"
+                  className="w-full mt-3 p-3 border rounded-xl bg-gray-50"
+                  name="motivo"
+                />
+                {errors.motivo && touched.motivo && toast.error(errors.motivo)}
               </div>
-
-              {/* Información de contacto */}
-              <div className="col-span-1">
-                {[{ label: "Email", name: "email", type: "email" },
-                  { label: "Dirección", name: "direccion" }]
-                  .map(({ label, name, type = "text" }) => (
-                    <div className="mb-4" key={name}>
-                      <label className="block text-gray-700 font-bold mb-1" htmlFor={name}>
-                        {label}
-                      </label>
-                      <Field
-                        id={name}
-                        type={type}
-                        name={name}
-                        placeholder={label}
-                        className="w-full p-3 border rounded-lg bg-gray-100 focus:ring focus:ring-blue-300"
-                      />
-                      <ErrorMessage name={name} component={Alerta} className="text-red-500 text-sm mt-1" />
-                    </div>
-                  ))}
-              </div>
-
-              {/* Antecedentes médicos */}
-              <div className="col-span-1">
-                {[{ label: "Alergias", name: "alergia" },
-                  { label: "Antecedentes Médicos", name: "antecedentesMedicos" },
-                  { label: "Ectoscopia", name: "ectoscopia" }]
-                  .map(({ label, name }) => (
-                    <div className="mb-4" key={name}>
-                      <label className="block text-gray-700 font-bold mb-1" htmlFor={name}>
-                        {label}
-                      </label>
-                      <Field
-                        id={name}
-                        type="text"
-                        name={name}
-                        placeholder={label}
-                        className="w-full p-3 border rounded-lg bg-gray-100 focus:ring focus:ring-blue-300"
-                      />
-                      <ErrorMessage name={name} component={Alerta} className="text-red-500 text-sm mt-1" />
-                    </div>
-                  ))}
-
-                {/* Campo de texto largo para motivo */}
-                <div className="mb-4">
-                  <label className="block text-gray-700 font-bold mb-1" htmlFor="motivo">
-                    Motivo
-                  </label>
-                  <Field
-                    id="motivo"
-                    name="motivo"
-                    as="textarea"
-                    rows="5"
-                    placeholder="Especifica el motivo"
-                    className="w-full p-3 border rounded-lg bg-gray-100 focus:ring focus:ring-blue-300"
-                  />
-                  <ErrorMessage name="motivo" component={Alerta} className="text-red-500 text-sm mt-1" />
-                </div>
-              </div>
-
             </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
-            >
-              Registrar Cliente
-            </button>
+            <div>
+              <button
+                type="submit"
+                className="bg-sky-700 w-full rounded py-3 text-white font-bold uppercase hover:bg-sky-800 transition-colors"
+              >
+                Registrar Cliente y Antecedente Médico
+              </button>
+            </div>
           </Form>
         )}
       </Formik>
-
-      <ToastContainer />
     </div>
   );
 };

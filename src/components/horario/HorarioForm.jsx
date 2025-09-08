@@ -17,17 +17,17 @@ const horarioSchema = Yup.object().shape({
 });
 
 export const HorarioForm = ({ horario }) => {
-
+   const { user } = useSelector((state) => state.usuario);
   const [alerta, setAlerta] = useState({});
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = (values, resetForm) => {
-
+    console.log("values horario ",{...values, idEmpresa: user.idEmpresa})
     if (!values.idHorario) {
       
-      dispatch(registrarHorario(values))
+      dispatch(registrarHorario({...values, idEmpresa: user.idEmpresa}))
         .unwrap()
         .then((resultado) => {
           console.log("resultado ===>> ", resultado);

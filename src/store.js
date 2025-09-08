@@ -13,8 +13,12 @@ import rolMenu from './slices/rolMenuSlice'
 import consultorio from './slices/consultorioSlice'
 import antecedenteMedico from './slices/antecedenteMedicoSlice'
 import fichaMedica from './slices/fichaMedicaSlice'
-
-
+import historiaClinica from './slices/historiaClinicaSlice'
+import dashboard from './slices/dashboardSlice'
+import maestra from './slices/maestraSlice'
+import tipoEmpleado from './slices/tipoEmpleadoSlice'
+import menu from './slices/menuSlice'
+import session from './slices/sessionSlice'
 
 export default configureStore({
   reducer: {
@@ -31,6 +35,12 @@ export default configureStore({
     antecedenteMedico,
     consultorio,
     rolMenu,
-    fichaMedica
+    fichaMedica,
+    historiaClinica,
+    dashboard,
+    maestra,
+    tipoEmpleado,
+    menu,
+    session,
   }
 })
